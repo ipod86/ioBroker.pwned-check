@@ -1,0 +1,139 @@
+{
+	"common": {
+		"name": "pwned-check",
+		"version": "0.0.1",
+		"news": {
+			"0.0.1": {
+				"en": "Initial release",
+				"de": "Erstveröffentlichung",
+				"ru": "Первый выпуск",
+				"pt": "Versão inicial",
+				"nl": "Eerste versie",
+				"fr": "Version initiale",
+				"it": "Versione iniziale",
+				"es": "Versión inicial",
+				"pl": "Pierwsze wydanie",
+				"uk": "Перший випуск",
+				"zh-cn": "初始版本"
+			}
+		},
+		"titleLang": {
+			"en": "Pwned Check",
+			"de": "Pwned Check",
+			"ru": "Pwned Check",
+			"pt": "Pwned Check",
+			"nl": "Pwned Check",
+			"fr": "Pwned Check",
+			"it": "Pwned Check",
+			"es": "Pwned Check",
+			"pl": "Pwned Check",
+			"uk": "Pwned Check",
+			"zh-cn": "Pwned Check"
+		},
+		"desc": {
+			"en": "Leak & Password Check (Privacy First)",
+			"de": "Leak- & Passwort-Prüfung (Privacy First)",
+			"ru": "Проверка утечек и паролей (приватность прежде всего)",
+			"pt": "Verificação de Vazamentos e Senhas (Privacidade em Primeiro Lugar)",
+			"nl": "Lek- en wachtwoordcontrole (Privacy First)",
+			"fr": "Vérification des fuites et des mots de passe (Privacy First)",
+			"it": "Verifica fughe e password (Privacy First)",
+			"es": "Verificación de filtraciones y contraseñas (Privacy First)",
+			"pl": "Sprawdzanie wycieków i haseł (Privacy First)",
+			"uk": "Перевірка витоків і паролів (Privacy First)",
+			"zh-cn": "泄露和密码检查（隐私优先）"
+		},
+		"authors": [
+			"ioBroker Developer <dev@example.com>"
+		],
+		"keywords": [
+			"security",
+			"password",
+			"leak",
+			"check",
+			"privacy",
+			"password-check",
+			"hibp",
+			"pwned",
+			"credentials",
+			"iobroker"
+		],
+		"licenseInformation": {
+			"type": "free",
+			"license": "MIT"
+		},
+		"platform": "Javascript/Node.js",
+		"icon": "pwned-check.png",
+		"enabled": true,
+		"extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.pwned-check/main/admin/pwned-check.png",
+		"readme": "https://github.com/ioBroker/ioBroker.pwned-check/blob/main/README.md",
+		"loglevel": "info",
+		"tier": 3,
+		"mode": "daemon",
+		"type": "alarm",
+		"compact": true,
+		"connectionType": "cloud",
+		"dataSource": "poll",
+		"adminUI": {
+			"config": "materialize"
+		},
+		"supportedMessages": {
+			"notifications": true
+		},
+		"dependencies": [
+			{
+				"js-controller": ">=6.0.11"
+			}
+		],
+		"globalDependencies": [
+			{
+				"admin": ">=7.6.20"
+			}
+		]
+	},
+	"native": {
+		"passwords": [],
+		"emails": [],
+		"checkInterval": 24,
+		"theme": "auto"
+	},
+	"encryptedNative": ["passwords"],
+	"protectedNative": ["passwords"],
+	"objects": [],
+	"instanceObjects": [
+		{
+			"_id": "info",
+			"type": "channel",
+			"common": {
+				"name": "Information"
+			},
+			"native": {}
+		},
+		{
+			"_id": "info.connection",
+			"type": "state",
+			"common": {
+				"role": "indicator.connected",
+				"name": "Device or service connected",
+				"type": "boolean",
+				"read": true,
+				"write": false,
+				"def": false
+			},
+			"native": {}
+		},
+		{
+			"_id": "visualisation",
+			"type": "state",
+			"common": {
+				"name": "Visualisation HTML",
+				"role": "html",
+				"type": "string",
+				"read": true,
+				"write": false,
+				"def": ""
+			},
+			"native": {}
+		}
+	]
+}
