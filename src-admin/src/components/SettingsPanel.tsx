@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     Box,
-    Button,
-    CircularProgress,
     Divider,
     FormControl,
     InputLabel,
@@ -11,41 +9,17 @@ import {
     Slider,
     Typography,
 } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { I18n } from '@iobroker/adapter-react-v5';
 import { PwnedCheckConfig } from '../types';
 
 interface Props {
     native: PwnedCheckConfig;
     onChange: (newNative: PwnedCheckConfig) => void;
-    socket: any;
-    instance: number;
 }
 
-const SettingsPanel: React.FC<Props> = ({ native, onChange, socket, instance }) => {
-    const [checking, setChecking] = useState(false);
-    const [checkResult, setCheckResult] = useState<string | null>(null);
-
+const SettingsPanel: React.FC<Props> = ({ native, onChange }) => {
     const update = (field: keyof PwnedCheckConfig, value: any): void => {
         onChange({ ...native, [field]: value });
-    };
-
-    const handleCheckNow = async (): Promise<void> => {
-        setChecking(true);
-        setCheckResult(null);
-        try {
-            await new Promise<void>((resolve, reject) => {
-                socket.sendTo(`pwned-check.${instance}`, 'checkNow', {}, (res: any) => {
-                    if (res?.error) reject(new Error(res.error));
-                    else resolve();
-                });
-            });
-            setCheckResult(I18n.t('checkTriggered'));
-        } catch {
-            setCheckResult(I18n.t('checkError'));
-        } finally {
-            setChecking(false);
-        }
     };
 
     const bgOpacity = native.bgOpacity ?? 100;
@@ -144,31 +118,6 @@ const SettingsPanel: React.FC<Props> = ({ native, onChange, socket, instance }) 
                 </Box>
             </Box>
 
-            <Divider />
-
-            {/* Manual check */}
-            <Box>
-                <Typography variant="h6" gutterBottom>{I18n.t('manualCheck')}</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {I18n.t('manualCheckHint')}
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Button
-                        variant="contained"
-                        startIcon={checking ? <CircularProgress size={16} color="inherit" /> : <PlayArrowIcon />}
-                        onClick={() => void handleCheckNow()}
-                        disabled={checking}
-                        color="primary"
-                    >
-                        {I18n.t('checkNow')}
-                    </Button>
-                    {checkResult && (
-                        <Typography variant="body2" color="text.secondary">
-                            {checkResult}
-                        </Typography>
-                    )}
-                </Box>
-            </Box>
         </Box>
     );
 };

@@ -78,8 +78,6 @@ class App extends GenericApp<GenericAppProps, AppState> {
 								}
 							});
 						}}
-						socket={this.socket}
-						instance={this.instance}
 					/>
 				)}
 
