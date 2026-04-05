@@ -355,7 +355,7 @@ class PwnedCheck extends utils.Adapter {
 					await this.setObjectNotExistsAsync(`emails.${safeId}.leaks.${safeService}`, {
 						type: "state",
 						common: {
-							name: `${entry.label} — leaked in ${service}`,
+							name: service,
 							role: "indicator",
 							type: "boolean",
 							read: true,
