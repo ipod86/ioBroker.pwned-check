@@ -380,16 +380,14 @@ class PwnedCheck extends utils.Adapter {
 					this.log.warn(
 						`Email "${entry.label}" found in ${breachList.length} breach(es): ${breachList.join(", ")}`,
 					);
-					for (const service of breachList) {
-						try {
-							(this as any).registerNotification(
-								"system",
-								"securityIssues",
-								`[pwned-check] Email "${entry.label}" found in data breach: ${service}`,
-							);
-						} catch {
-							// ignore
-						}
+					try {
+						(this as any).registerNotification(
+							"system",
+							"securityIssues",
+							`[pwned-check] Email "${entry.label}" found in ${breachList.length} data breach(es): ${breachList.join(", ")}`,
+						);
+					} catch {
+						// ignore
 					}
 				}
 			} else if (prev?.isPwned) {
