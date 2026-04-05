@@ -4,7 +4,6 @@
  */
 
 import * as utils from "@iobroker/adapter-core";
-import https from "https";
 
 interface PasswordEntry {
 	id: string;
@@ -41,21 +40,21 @@ function normalizeId(str: string): string {
  * @param url - The URL to GET
  * @returns Response body as string
  */
-function httpsGet(url: string): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const req = https.get(url, { headers: { "User-Agent": "ioBroker-pwned-check/0.0.1" } }, res => {
-			let data = "";
-			res.on("data", (chunk: Buffer) => {
-				data += chunk.toString();
-			});
-			res.on("end", () => resolve(data));
-			res.on("error", reject);
+async function httpsGet(url: string): Promise<string> {
+	const controller = new AbortController();
+	const timer = setTimeout(() => controller.abort(), 15000);
+	try {
+		const res = await fetch(url, {
+			headers: { "User-Agent": "ioBroker-pwned-check/0.0.1" },
+			signal: controller.signal,
 		});
-		req.on("error", reject);
-		req.setTimeout(15000, () => {
-			req.destroy(new Error("Request timed out"));
-		});
-	});
+		return await res.text();
+	} catch (err: any) {
+		if (err?.name === "AbortError") throw new Error("Request timed out");
+		throw err;
+	} finally {
+		clearTimeout(timer);
+	}
 }
 
 class PwnedCheck extends utils.Adapter {

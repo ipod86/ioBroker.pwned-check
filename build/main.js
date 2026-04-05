@@ -22,25 +22,24 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var utils = __toESM(require("@iobroker/adapter-core"));
-var import_https = __toESM(require("https"));
 function normalizeId(str) {
   return str.replace(/[^a-zA-Z0-9_]/g, "_").toLowerCase();
 }
-function httpsGet(url) {
-  return new Promise((resolve, reject) => {
-    const req = import_https.default.get(url, { headers: { "User-Agent": "ioBroker-pwned-check/0.0.1" } }, (res) => {
-      let data = "";
-      res.on("data", (chunk) => {
-        data += chunk.toString();
-      });
-      res.on("end", () => resolve(data));
-      res.on("error", reject);
+async function httpsGet(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15e3);
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": "ioBroker-pwned-check/0.0.1" },
+      signal: controller.signal
     });
-    req.on("error", reject);
-    req.setTimeout(15e3, () => {
-      req.destroy(new Error("Request timed out"));
-    });
-  });
+    return await res.text();
+  } catch (err) {
+    if ((err == null ? void 0 : err.name) === "AbortError") throw new Error("Request timed out");
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 class PwnedCheck extends utils.Adapter {
   checkTimer = null;
