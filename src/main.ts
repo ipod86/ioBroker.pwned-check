@@ -43,23 +43,14 @@ function normalizeId(str: string): string {
  */
 function httpsGet(url: string): Promise<string> {
 	return new Promise((resolve, reject) => {
-		const options = new URL(url);
-		const req = https.get(
-			{
-				hostname: options.hostname,
-				path: options.pathname + options.search,
-				headers: {
-					"User-Agent": "ioBroker-pwned-check/0.0.1",
-				},
-			},
-			res => {
-				let data = "";
-				res.on("data", (chunk: Buffer) => {
-					data += chunk.toString();
-				});
-				res.on("end", () => resolve(data));
-			},
-		);
+		const req = https.get(url, { headers: { "User-Agent": "ioBroker-pwned-check/0.0.1" } }, res => {
+			let data = "";
+			res.on("data", (chunk: Buffer) => {
+				data += chunk.toString();
+			});
+			res.on("end", () => resolve(data));
+			res.on("error", reject);
+		});
 		req.on("error", reject);
 		req.setTimeout(15000, () => {
 			req.destroy(new Error("Request timed out"));

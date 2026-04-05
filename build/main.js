@@ -28,23 +28,14 @@ function normalizeId(str) {
 }
 function httpsGet(url) {
   return new Promise((resolve, reject) => {
-    const options = new URL(url);
-    const req = import_https.default.get(
-      {
-        hostname: options.hostname,
-        path: options.pathname + options.search,
-        headers: {
-          "User-Agent": "ioBroker-pwned-check/0.0.1"
-        }
-      },
-      (res) => {
-        let data = "";
-        res.on("data", (chunk) => {
-          data += chunk.toString();
-        });
-        res.on("end", () => resolve(data));
-      }
-    );
+    const req = import_https.default.get(url, { headers: { "User-Agent": "ioBroker-pwned-check/0.0.1" } }, (res) => {
+      let data = "";
+      res.on("data", (chunk) => {
+        data += chunk.toString();
+      });
+      res.on("end", () => resolve(data));
+      res.on("error", reject);
+    });
     req.on("error", reject);
     req.setTimeout(15e3, () => {
       req.destroy(new Error("Request timed out"));
@@ -69,7 +60,7 @@ class PwnedCheck extends utils.Adapter {
    */
   async onReady() {
     var _a;
-    this.setState("info.connection", { val: false, ack: true });
+    void this.setState("info.connection", { val: false, ack: true });
     const config = this.config;
     await this.cleanupOrphanedObjects(config);
     await this.runAllChecks(config);
@@ -112,7 +103,7 @@ class PwnedCheck extends utils.Adapter {
    */
   async runAllChecks(config) {
     var _a, _b;
-    this.setState("info.connection", { val: true, ack: true });
+    void this.setState("info.connection", { val: true, ack: true });
     const passwords = (_a = config.passwords) != null ? _a : [];
     const emails = (_b = config.emails) != null ? _b : [];
     for (const entry of passwords) {
