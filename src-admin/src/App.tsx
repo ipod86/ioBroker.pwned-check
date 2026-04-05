@@ -25,13 +25,10 @@ interface AppState extends GenericAppState {
 
 class App extends GenericApp<GenericAppProps, AppState> {
 	constructor(props: GenericAppProps) {
-		const extendedProps = {
-			...props,
-			adapterName: 'pwned-check',
-			encryptedFields: ['passwords'],
+		super(props, {
+			encryptedFields: [],
 			translations: { en, de, ru, pt, nl, fr, it, es, pl, uk, 'zh-cn': zhCn },
-		};
-		super(props, extendedProps);
+		} as any);
 		this.state = {
 			...this.state,
 			tab: 0,
@@ -87,7 +84,6 @@ class App extends GenericApp<GenericAppProps, AppState> {
 				)}
 
 				{this.renderError()}
-				{this.renderToast()}
 				{this.renderSaveCloseButtons()}
 			</div>
 		);
