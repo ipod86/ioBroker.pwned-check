@@ -95,7 +95,10 @@
 		"passwords": [],
 		"emails": [],
 		"checkInterval": 24,
-		"theme": "auto"
+		"theme": "auto",
+		"bgOpacity": 100,
+		"cardOpacity": 100,
+		"fontSize": 14
 	},
 	"objects": [],
 	"instanceObjects": [

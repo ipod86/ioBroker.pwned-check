@@ -14,4 +14,7 @@ export interface PwnedCheckConfig {
     emails: EmailEntry[];
     checkInterval: number;
     theme: 'auto' | 'light' | 'dark';
+    bgOpacity: number;
+    cardOpacity: number;
+    fontSize: number;
 }

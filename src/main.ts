@@ -21,6 +21,9 @@ interface AdapterConfig {
 	emails: EmailEntry[];
 	checkInterval: number;
 	theme: "auto" | "light" | "dark";
+	bgOpacity: number;
+	cardOpacity: number;
+	fontSize: number;
 }
 
 type Lang = "en" | "de" | "ru" | "pt" | "nl" | "fr" | "it" | "es" | "pl" | "uk" | "zh-cn";
@@ -553,15 +556,19 @@ class PwnedCheck extends utils.Adapter {
 		const passwords = config.passwords ?? [];
 		const emails = config.emails ?? [];
 		const theme = config.theme ?? "auto";
+		const bgOpacity = config.bgOpacity ?? 100;
+		const cardOpacity = config.cardOpacity ?? 100;
+		const fontSize = config.fontSize ?? 14;
 
-		const isDark = theme === "dark" || (theme === "auto" && false); // auto: default to light; could be extended with system.config check
+		const isDark = theme === "dark" || (theme === "auto" && false);
 
-		const bgColor = isDark ? "#1a1a2e" : "#f5f5f5";
-		const cardBg = isDark ? "#16213e" : "#ffffff";
+		const bgRgb = isDark ? "26,26,46" : "245,245,245";
+		const cardRgb = isDark ? "22,33,62" : "255,255,255";
 		const textColor = isDark ? "#e0e0e0" : "#212121";
 		const borderColor = isDark ? "#0f3460" : "#e0e0e0";
 
-		const safeCardBg = cardBg;
+		const bgColor = `rgba(${bgRgb},${(bgOpacity / 100).toFixed(2)})`;
+		const safeCardBg = `rgba(${cardRgb},${(cardOpacity / 100).toFixed(2)})`;
 		const safeTextColor = textColor;
 
 		// Gather current states for passwords
@@ -643,7 +650,7 @@ class PwnedCheck extends utils.Adapter {
 		}
 
 		const html = `
-<div style="font-family:sans-serif;background:${bgColor};padding:16px;border-radius:10px;color:${safeTextColor};">
+<div style="font-family:sans-serif;font-size:${fontSize}px;background:${bgColor};padding:16px;border-radius:10px;color:${safeTextColor};">
 	<h3 style="margin:0 0 12px 0;color:${safeTextColor};">Pwned Check</h3>
 	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">Passwords</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
 	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">E-Mails</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">${emailCards.join("")}</div>` : ""}

@@ -495,16 +495,20 @@ class PwnedCheck extends utils.Adapter {
    * @param config - Adapter configuration
    */
   async updateVisualisation(config) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e, _f;
     const passwords = (_a = config.passwords) != null ? _a : [];
     const emails = (_b = config.emails) != null ? _b : [];
     const theme = (_c = config.theme) != null ? _c : "auto";
+    const bgOpacity = (_d = config.bgOpacity) != null ? _d : 100;
+    const cardOpacity = (_e = config.cardOpacity) != null ? _e : 100;
+    const fontSize = (_f = config.fontSize) != null ? _f : 14;
     const isDark = theme === "dark" || theme === "auto" && false;
-    const bgColor = isDark ? "#1a1a2e" : "#f5f5f5";
-    const cardBg = isDark ? "#16213e" : "#ffffff";
+    const bgRgb = isDark ? "26,26,46" : "245,245,245";
+    const cardRgb = isDark ? "22,33,62" : "255,255,255";
     const textColor = isDark ? "#e0e0e0" : "#212121";
     const borderColor = isDark ? "#0f3460" : "#e0e0e0";
-    const safeCardBg = cardBg;
+    const bgColor = `rgba(${bgRgb},${(bgOpacity / 100).toFixed(2)})`;
+    const safeCardBg = `rgba(${cardRgb},${(cardOpacity / 100).toFixed(2)})`;
     const safeTextColor = textColor;
     const pwCards = [];
     for (const entry of passwords) {
@@ -566,7 +570,7 @@ class PwnedCheck extends utils.Adapter {
 				</div>`);
     }
     const html = `
-<div style="font-family:sans-serif;background:${bgColor};padding:16px;border-radius:10px;color:${safeTextColor};">
+<div style="font-family:sans-serif;font-size:${fontSize}px;background:${bgColor};padding:16px;border-radius:10px;color:${safeTextColor};">
 	<h3 style="margin:0 0 12px 0;color:${safeTextColor};">Pwned Check</h3>
 	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">Passwords</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
 	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">E-Mails</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">${emailCards.join("")}</div>` : ""}
