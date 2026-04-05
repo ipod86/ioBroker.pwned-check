@@ -97,8 +97,6 @@
 		"checkInterval": 24,
 		"theme": "auto"
 	},
-	"encryptedNative": ["passwords"],
-	"protectedNative": ["passwords"],
 	"objects": [],
 	"instanceObjects": [
 		{
