@@ -4,7 +4,7 @@
     "tabSettings": "Settings",
     "passwords": "Passwords",
     "passwordsHint": "Passwords are never sent to any server. The SHA-1 hash is computed in your browser and only the first 5 characters are transmitted (k-anonymity).",
-    "service": "Service",
+    "description": "Description",
     "password": "Password",
     "hash": "SHA-1 Hash",
     "actions": "Actions",

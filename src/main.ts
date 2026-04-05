@@ -7,13 +7,12 @@ import * as utils from "@iobroker/adapter-core";
 
 interface PasswordEntry {
 	id: string;
-	service: string;
+	description: string;
 	hash: string;
 }
 
 interface EmailEntry {
 	id: string;
-	label: string;
 	email: string;
 }
 
@@ -135,7 +134,7 @@ class PwnedCheck extends utils.Adapter {
 
 		for (const entry of passwords) {
 			if (!entry.hash || entry.hash.length < 6) {
-				this.log.warn(`Password entry "${entry.service}" has no valid hash, skipping`);
+				this.log.warn(`Password entry "${entry.description}" has no valid hash, skipping`);
 				continue;
 			}
 			await this.checkPasswordEntry(entry);
@@ -143,7 +142,7 @@ class PwnedCheck extends utils.Adapter {
 
 		for (const entry of emails) {
 			if (!entry.email) {
-				this.log.warn(`Email entry "${entry.label}" has no email, skipping`);
+				this.log.warn(`Email entry "${entry.email}" has no email, skipping`);
 				continue;
 			}
 			await this.checkEmailEntry(entry);
@@ -158,7 +157,7 @@ class PwnedCheck extends utils.Adapter {
 	 * @param entry - The password entry with pre-computed SHA-1 hash
 	 */
 	private async checkPasswordEntry(entry: PasswordEntry): Promise<void> {
-		const safeId = normalizeId(entry.service);
+		const safeId = normalizeId(entry.description);
 		const prefix = entry.hash.substring(0, 5).toUpperCase();
 		const suffix = entry.hash.substring(5).toUpperCase();
 		const now = new Date().toISOString();
@@ -183,13 +182,13 @@ class PwnedCheck extends utils.Adapter {
 			// Ensure objects exist
 			await this.setObjectNotExistsAsync(`passwords.${safeId}`, {
 				type: "channel",
-				common: { name: entry.service },
+				common: { name: entry.description },
 				native: {},
 			});
 			await this.setObjectNotExistsAsync(`passwords.${safeId}.isPwned`, {
 				type: "state",
 				common: {
-					name: `${entry.service} — is pwned`,
+					name: `${entry.description} — is pwned`,
 					role: "indicator.alarm",
 					type: "boolean",
 					read: true,
@@ -201,7 +200,7 @@ class PwnedCheck extends utils.Adapter {
 			await this.setObjectNotExistsAsync(`passwords.${safeId}.leakCount`, {
 				type: "state",
 				common: {
-					name: `${entry.service} — leak count`,
+					name: `${entry.description} — leak count`,
 					role: "value",
 					type: "number",
 					read: true,
@@ -213,7 +212,7 @@ class PwnedCheck extends utils.Adapter {
 			await this.setObjectNotExistsAsync(`passwords.${safeId}.lastCheck`, {
 				type: "state",
 				common: {
-					name: `${entry.service} — last check`,
+					name: `${entry.description} — last check`,
 					role: "date",
 					type: "string",
 					read: true,
@@ -234,12 +233,12 @@ class PwnedCheck extends utils.Adapter {
 			if (isPwned) {
 				if (!prev?.isPwned) {
 					// Newly pwned
-					this.log.warn(`Password for "${entry.service}" found in ${leakCount} breaches!`);
+					this.log.warn(`Password for "${entry.description}" found in ${leakCount} breaches!`);
 					try {
 						(this as any).registerNotification(
 							"system",
 							"securityIssues",
-							`[pwned-check] Password for "${entry.service}" found in ${leakCount} data breach(es)! Please change it immediately.`,
+							`[pwned-check] Password for "${entry.description}" found in ${leakCount} data breach(es)! Please change it immediately.`,
 						);
 					} catch {
 						// notifications may not be available in all environments
@@ -250,7 +249,7 @@ class PwnedCheck extends utils.Adapter {
 						(this as any).registerNotification(
 							"system",
 							"securityIssues",
-							`[pwned-check] Password for "${entry.service}" now found in ${leakCount} breaches (was ${prev.leakCount}).`,
+							`[pwned-check] Password for "${entry.description}" now found in ${leakCount} breaches (was ${prev.leakCount}).`,
 						);
 					} catch {
 						// ignore
@@ -258,12 +257,12 @@ class PwnedCheck extends utils.Adapter {
 				}
 			} else if (prev?.isPwned) {
 				// Cleared!
-				this.log.info(`Password for "${entry.service}" is no longer found in breaches.`);
+				this.log.info(`Password for "${entry.description}" is no longer found in breaches.`);
 				try {
 					(this as any).registerNotification(
 						"system",
 						"securityIssues",
-						`[pwned-check] Security cleared: Password for "${entry.service}" is no longer found in known breaches.`,
+						`[pwned-check] Security cleared: Password for "${entry.description}" is no longer found in known breaches.`,
 					);
 				} catch {
 					// ignore
@@ -271,9 +270,9 @@ class PwnedCheck extends utils.Adapter {
 			}
 
 			this.prevState.set(prevKey, { isPwned, leakCount });
-			this.log.debug(`Password check for "${entry.service}": isPwned=${isPwned}, leakCount=${leakCount}`);
+			this.log.debug(`Password check for "${entry.description}": isPwned=${isPwned}, leakCount=${leakCount}`);
 		} catch (err) {
-			this.log.error(`Error checking password for "${entry.service}": ${String(err)}`);
+			this.log.error(`Error checking password for "${entry.description}": ${String(err)}`);
 		}
 	}
 
@@ -283,7 +282,7 @@ class PwnedCheck extends utils.Adapter {
 	 * @param entry - The email entry
 	 */
 	private async checkEmailEntry(entry: EmailEntry): Promise<void> {
-		const safeId = normalizeId(entry.label);
+		const safeId = normalizeId(entry.email);
 		const now = new Date().toISOString();
 
 		try {
@@ -317,13 +316,13 @@ class PwnedCheck extends utils.Adapter {
 			// Ensure objects exist
 			await this.setObjectNotExistsAsync(`emails.${safeId}`, {
 				type: "channel",
-				common: { name: entry.label },
+				common: { name: entry.email },
 				native: {},
 			});
 			await this.setObjectNotExistsAsync(`emails.${safeId}.isPwned`, {
 				type: "state",
 				common: {
-					name: `${entry.label} — is pwned`,
+					name: `${entry.email} — is pwned`,
 					role: "indicator.alarm",
 					type: "boolean",
 					read: true,
@@ -335,7 +334,7 @@ class PwnedCheck extends utils.Adapter {
 			await this.setObjectNotExistsAsync(`emails.${safeId}.lastCheck`, {
 				type: "state",
 				common: {
-					name: `${entry.label} — last check`,
+					name: `${entry.email} — last check`,
 					role: "date",
 					type: "string",
 					read: true,
@@ -378,25 +377,25 @@ class PwnedCheck extends utils.Adapter {
 			if (isPwned) {
 				if (!prev?.isPwned) {
 					this.log.warn(
-						`Email "${entry.label}" found in ${breachList.length} breach(es): ${breachList.join(", ")}`,
+						`Email "${entry.email}" found in ${breachList.length} breach(es): ${breachList.join(", ")}`,
 					);
 					try {
 						(this as any).registerNotification(
 							"system",
 							"securityIssues",
-							`[pwned-check] Email "${entry.label}" found in ${breachList.length} data breach(es): ${breachList.join(", ")}`,
+							`[pwned-check] Email "${entry.email}" found in ${breachList.length} data breach(es): ${breachList.join(", ")}`,
 						);
 					} catch {
 						// ignore
 					}
 				}
 			} else if (prev?.isPwned) {
-				this.log.info(`Email "${entry.label}" is no longer found in breaches.`);
+				this.log.info(`Email "${entry.email}" is no longer found in breaches.`);
 				try {
 					(this as any).registerNotification(
 						"system",
 						"securityIssues",
-						`[pwned-check] Security cleared: Email "${entry.label}" is no longer found in known breaches.`,
+						`[pwned-check] Security cleared: Email "${entry.email}" is no longer found in known breaches.`,
 					);
 				} catch {
 					// ignore
@@ -404,9 +403,9 @@ class PwnedCheck extends utils.Adapter {
 			}
 
 			this.prevState.set(prevKey, { isPwned });
-			this.log.debug(`Email check for "${entry.label}": isPwned=${isPwned}, breaches=${breachList.join(",")}`);
+			this.log.debug(`Email check for "${entry.email}": isPwned=${isPwned}, breaches=${breachList.join(",")}`);
 		} catch (err) {
-			this.log.error(`Error checking email for "${entry.label}": ${String(err)}`);
+			this.log.error(`Error checking email for "${entry.email}": ${String(err)}`);
 		}
 	}
 
@@ -438,8 +437,8 @@ class PwnedCheck extends utils.Adapter {
 	 * @param config - Current adapter configuration
 	 */
 	private async cleanupOrphanedObjects(config: AdapterConfig): Promise<void> {
-		const configPasswordIds = new Set((config.passwords ?? []).map(p => normalizeId(p.service)));
-		const configEmailIds = new Set((config.emails ?? []).map(e => normalizeId(e.label)));
+		const configPasswordIds = new Set((config.passwords ?? []).map(p => normalizeId(p.description)));
+		const configEmailIds = new Set((config.emails ?? []).map(e => normalizeId(e.email)));
 
 		// Clean up passwords
 		try {
@@ -507,7 +506,7 @@ class PwnedCheck extends utils.Adapter {
 		// Gather current states for passwords
 		const pwCards: string[] = [];
 		for (const entry of passwords) {
-			const safeId = normalizeId(entry.service);
+			const safeId = normalizeId(entry.description);
 			let isPwned = false;
 			let leakCount = 0;
 
@@ -531,7 +530,7 @@ class PwnedCheck extends utils.Adapter {
 				<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
 					${lockSvg}
 					<div>
-						<div style="font-weight:600;font-size:14px;color:${safeTextColor};">${escapeHtml(entry.service)}</div>
+						<div style="font-weight:600;font-size:14px;color:${safeTextColor};">${escapeHtml(entry.description)}</div>
 						<div style="font-size:12px;color:${statusColor};font-weight:500;">${statusText}</div>
 					</div>
 				</div>`);
@@ -540,7 +539,7 @@ class PwnedCheck extends utils.Adapter {
 		// Gather current states for emails
 		const emailCards: string[] = [];
 		for (const entry of emails) {
-			const safeId = normalizeId(entry.label);
+			const safeId = normalizeId(entry.email);
 			let isPwned = false;
 			const breachNames: string[] = [];
 
@@ -575,7 +574,7 @@ class PwnedCheck extends utils.Adapter {
 				<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
 					${lockSvg}
 					<div>
-						<div style="font-weight:600;font-size:14px;color:${safeTextColor};">${escapeHtml(entry.label)}</div>
+						<div style="font-weight:600;font-size:14px;color:${safeTextColor};">${escapeHtml(entry.email)}</div>
 						<div style="font-size:11px;color:#888;">${escapeHtml(entry.email)}</div>
 						<div style="font-size:12px;color:${statusColor};font-weight:500;">${statusText}</div>
 					</div>

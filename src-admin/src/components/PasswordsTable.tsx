@@ -27,7 +27,7 @@ interface Props {
 }
 
 interface NewRow {
-    service: string;
+    description: string;
     password: string;
     showPassword: boolean;
     hash: string;
@@ -79,7 +79,7 @@ async function sha1(password: string): Promise<string> {
 
 const PasswordsTable: React.FC<Props> = ({ passwords, onChange }) => {
     const [newRow, setNewRow] = useState<NewRow>({
-        service: '',
+        description: '',
         password: '',
         showPassword: false,
         hash: '',
@@ -94,16 +94,16 @@ const PasswordsTable: React.FC<Props> = ({ passwords, onChange }) => {
     };
 
     const handleAdd = async (): Promise<void> => {
-        if (!newRow.service.trim()) return;
+        if (!newRow.description.trim()) return;
         if (!newRow.hash) return;
 
         const entry: PasswordEntry = {
             id: Date.now().toString(36),
-            service: newRow.service.trim(),
+            description: newRow.description.trim(),
             hash: newRow.hash,
         };
         onChange([...passwords, entry]);
-        setNewRow({ service: '', password: '', showPassword: false, hash: '', entropy: 0 });
+        setNewRow({ description: '', password: '', showPassword: false, hash: '', entropy: 0 });
         setAdding(false);
     };
 
@@ -122,7 +122,7 @@ const PasswordsTable: React.FC<Props> = ({ passwords, onChange }) => {
             <Table size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell>{I18n.t('service')}</TableCell>
+                        <TableCell>{I18n.t('description')}</TableCell>
                         <TableCell>{I18n.t('hash')}</TableCell>
                         <TableCell>{I18n.t('actions')}</TableCell>
                     </TableRow>
@@ -130,7 +130,7 @@ const PasswordsTable: React.FC<Props> = ({ passwords, onChange }) => {
                 <TableBody>
                     {passwords.map(entry => (
                         <TableRow key={entry.id}>
-                            <TableCell>{entry.service}</TableCell>
+                            <TableCell>{entry.description}</TableCell>
                             <TableCell>
                                 <Typography variant="caption" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
                                     {entry.hash}
@@ -150,9 +150,9 @@ const PasswordsTable: React.FC<Props> = ({ passwords, onChange }) => {
                             <TableCell>
                                 <TextField
                                     size="small"
-                                    label={I18n.t('service')}
-                                    value={newRow.service}
-                                    onChange={e => setNewRow(prev => ({ ...prev, service: e.target.value }))}
+                                    label={I18n.t('description')}
+                                    value={newRow.description}
+                                    onChange={e => setNewRow(prev => ({ ...prev, description: e.target.value }))}
                                     sx={{ width: 160 }}
                                 />
                             </TableCell>
@@ -203,14 +203,14 @@ const PasswordsTable: React.FC<Props> = ({ passwords, onChange }) => {
                                     size="small"
                                     variant="contained"
                                     onClick={() => void handleAdd()}
-                                    disabled={!newRow.service.trim() || !newRow.hash}
+                                    disabled={!newRow.description.trim() || !newRow.hash}
                                     sx={{ mr: 1 }}
                                 >
                                     {I18n.t('save')}
                                 </Button>
                                 <Button
                                     size="small"
-                                    onClick={() => { setAdding(false); setNewRow({ service: '', password: '', showPassword: false, hash: '', entropy: 0 }); }}
+                                    onClick={() => { setAdding(false); setNewRow({ description: '', password: '', showPassword: false, hash: '', entropy: 0 }); }}
                                 >
                                     {I18n.t('cancel')}
                                 </Button>

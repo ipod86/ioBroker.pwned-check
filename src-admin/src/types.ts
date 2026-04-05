@@ -1,12 +1,11 @@
 export interface PasswordEntry {
     id: string;
-    service: string;
+    description: string;
     hash: string;
 }
 
 export interface EmailEntry {
     id: string;
-    label: string;
     email: string;
 }
 

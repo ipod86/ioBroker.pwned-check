@@ -22,25 +22,18 @@ interface Props {
     onChange: (emails: EmailEntry[]) => void;
 }
 
-interface NewRow {
-    label: string;
-    email: string;
-}
-
 const EmailsTable: React.FC<Props> = ({ emails, onChange }) => {
-    const [newRow, setNewRow] = useState<NewRow>({ label: '', email: '' });
+    const [newEmail, setNewEmail] = useState('');
     const [adding, setAdding] = useState(false);
 
     const handleAdd = (): void => {
-        if (!newRow.label.trim() || !newRow.email.trim()) return;
-
+        if (!newEmail.trim()) return;
         const entry: EmailEntry = {
             id: Date.now().toString(36),
-            label: newRow.label.trim(),
-            email: newRow.email.trim(),
+            email: newEmail.trim(),
         };
         onChange([...emails, entry]);
-        setNewRow({ label: '', email: '' });
+        setNewEmail('');
         setAdding(false);
     };
 
@@ -57,7 +50,6 @@ const EmailsTable: React.FC<Props> = ({ emails, onChange }) => {
             <Table size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell>{I18n.t('label')}</TableCell>
                         <TableCell>{I18n.t('email')}</TableCell>
                         <TableCell>{I18n.t('actions')}</TableCell>
                     </TableRow>
@@ -65,7 +57,6 @@ const EmailsTable: React.FC<Props> = ({ emails, onChange }) => {
                 <TableBody>
                     {emails.map(entry => (
                         <TableRow key={entry.id}>
-                            <TableCell>{entry.label}</TableCell>
                             <TableCell>{entry.email}</TableCell>
                             <TableCell>
                                 <Tooltip title={I18n.t('delete')}>
@@ -81,20 +72,13 @@ const EmailsTable: React.FC<Props> = ({ emails, onChange }) => {
                             <TableCell>
                                 <TextField
                                     size="small"
-                                    label={I18n.t('label')}
-                                    value={newRow.label}
-                                    onChange={e => setNewRow(prev => ({ ...prev, label: e.target.value }))}
-                                    sx={{ width: 160 }}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <TextField
-                                    size="small"
                                     label={I18n.t('email')}
                                     type="email"
-                                    value={newRow.email}
-                                    onChange={e => setNewRow(prev => ({ ...prev, email: e.target.value }))}
-                                    sx={{ width: 220 }}
+                                    value={newEmail}
+                                    onChange={e => setNewEmail(e.target.value)}
+                                    onKeyDown={e => e.key === 'Enter' && handleAdd()}
+                                    sx={{ width: 260 }}
+                                    autoFocus
                                 />
                             </TableCell>
                             <TableCell>
@@ -102,14 +86,14 @@ const EmailsTable: React.FC<Props> = ({ emails, onChange }) => {
                                     size="small"
                                     variant="contained"
                                     onClick={handleAdd}
-                                    disabled={!newRow.label.trim() || !newRow.email.trim()}
+                                    disabled={!newEmail.trim()}
                                     sx={{ mr: 1 }}
                                 >
                                     {I18n.t('save')}
                                 </Button>
                                 <Button
                                     size="small"
-                                    onClick={() => { setAdding(false); setNewRow({ label: '', email: '' }); }}
+                                    onClick={() => { setAdding(false); setNewEmail(''); }}
                                 >
                                     {I18n.t('cancel')}
                                 </Button>

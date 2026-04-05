@@ -4,7 +4,7 @@
     "tabSettings": "Einstellungen",
     "passwords": "Passwörter",
     "passwordsHint": "Passwörter werden niemals an einen Server übertragen. Der SHA-1-Hash wird im Browser berechnet und nur die ersten 5 Zeichen werden übertragen (k-Anonymität).",
-    "service": "Dienst",
+    "description": "Beschreibung",
     "password": "Passwort",
     "hash": "SHA-1-Hash",
     "actions": "Aktionen",
