@@ -55,8 +55,7 @@
 			"password-check",
 			"hibp",
 			"pwned",
-			"credentials",
-			"iobroker"
+			"credentials"
 		],
 		"licenseInformation": {
 			"type": "free",
