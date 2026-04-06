@@ -1,145 +1,103 @@
 ![Logo](admin/pwned-check.png)
+
 # ioBroker.pwned-check
 
 [![NPM version](https://img.shields.io/npm/v/iobroker.pwned-check.svg)](https://www.npmjs.com/package/iobroker.pwned-check)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.pwned-check.svg)](https://www.npmjs.com/package/iobroker.pwned-check)
 ![Number of Installations](https://iobroker.live/badges/pwned-check-installed.svg)
 ![Current version in stable repository](https://iobroker.live/badges/pwned-check-stable.svg)
-
 [![NPM](https://nodei.co/npm/iobroker.pwned-check.png?downloads=true)](https://nodei.co/npm/iobroker.pwned-check/)
 
 **Tests:** ![Test and Release](https://github.com/ipod86/ioBroker.pwned-check/workflows/Test%20and%20Release/badge.svg)
 
-## pwned-check adapter for ioBroker
+## ioBroker adapter for password and e-mail breach checking
 
-Check passwords and emails against breach databases (HIBP, XposedOrNot)
+This adapter checks whether your passwords or e-mail addresses have appeared in known data breaches — without ever sending your actual passwords to any server.
 
-## Developer manual
-This section is intended for the developer. It can be deleted later.
+## Features
 
-### DISCLAIMER
+- **Privacy first** – passwords are never transmitted. The SHA-1 hash is computed locally in the browser; only the first 5 characters are sent to the API (k-anonymity)
+- **Password check** – uses the free [Have I Been Pwned](https://haveibeenpwned.com/API/v3#PwnedPasswords) k-anonymity API — no API key required
+- **E-mail check** – uses the free [XposedOrNot](https://xposedornot.com) API — no API key required
+- **Breach details** – individual data points per breach source under `emails.<id>.leaks.*`
+- **ioBroker notifications** – sends a system notification when a new breach is detected, in the configured system language (11 languages supported)
+- **HTML visualisation** – generates a ready-to-use HTML data point for use in VIS or other dashboards
+- **Configurable appearance** – theme (light/dark), background transparency, card transparency, font size
+- **Configurable interval** – check every 3, 6, 12 or 24 hours
 
-Please make sure that you consider copyrights and trademarks when you use names or logos of a company and add a disclaimer to your README.
-You can check other adapters for examples or ask in the developer community. Using a name or logo of a company without permission may cause legal problems for you.
+## Installation
 
-### Getting started
+Install via the ioBroker Admin interface — search for **pwned-check**.
 
-You are almost done, only a few steps left:
-1. Create a new repository on GitHub with the name `ioBroker.pwned-check`
-1. Initialize the current folder as a new git repository:  
-	```bash
-	git init -b main
-	git add .
-	git commit -m "Initial commit"
-	```
-1. Link your local repository with the one on GitHub:  
-	```bash
-	git remote add origin https://github.com/ipod86/ioBroker.pwned-check
-	```
+## Configuration
 
-1. Push all files to the GitHub repo:  
-	```bash
-	git push origin main
-	```
-1. Add a new secret under https://github.com/ipod86/ioBroker.pwned-check/settings/secrets. It must be named `AUTO_MERGE_TOKEN` and contain a personal access token with push access to the repository, e.g. yours. You can create a new token under https://github.com/settings/tokens.
+### Passwords tab
 
-1. Head over to [src/main.ts](src/main.ts) and start programming!
+Add one entry per password you want to monitor. Enter a **description** (e.g. the service name) and the **password**. The SHA-1 hash is computed in your browser and stored — the plaintext password is never saved.
 
-### Best Practices
-We've collected some [best practices](https://github.com/ioBroker/ioBroker.repositories#development-and-coding-best-practices) regarding ioBroker development and coding in general. If you're new to ioBroker or Node.js, you should
-check them out. If you're already experienced, you should also take a look at them - you might learn something new :)
+| Field | Description |
+|-------|-------------|
+| Description | A label for this password (e.g. "GitHub") |
+| Password | Entered once; only the SHA-1 hash is stored |
 
-### State Roles
-When creating state objects, it is important to use the correct role for the state. The role defines how the state should be interpreted by visualizations and other adapters. For a list of available roles and their meanings, please refer to the [state roles documentation](https://www.iobroker.net/#en/documentation/dev/stateroles.md).
+### E-Mails tab
 
-**Important:** Do not invent your own custom role names. If you need a role that is not part of the official list, please contact the ioBroker developer community for guidance and discussion about adding new roles.
+Add one entry per e-mail address to monitor.
 
-### Scripts in `package.json`
-Several npm scripts are predefined for your convenience. You can run them using `npm run <scriptname>`
-| Script name | Description |
-|-------------|-------------|
-| `build` | Compile the TypeScript and React sources. |
-| `watch` | Compile the TypeScript and React sources and watch for changes. |
-| `build:ts` | Compile the TypeScript sources. |
-| `watch:ts` | Compile the TypeScript sources and watch for changes. |
-| `build:react` | Compile the React sources. |
-| `watch:react` | Compile the React sources and watch for changes. |
-| `test:ts` | Executes the tests you defined in `*.test.ts` files. |
-| `test:package` | Ensures your `package.json` and `io-package.json` are valid. |
-| `test:integration` | Tests the adapter startup with an actual instance of ioBroker. |
-| `test` | Performs a minimal test run on package files and your tests. |
-| `check` | Performs a type-check on your code (without compiling anything). |
-| `lint` | Runs `ESLint` to check your code for formatting errors and potential bugs. |
-| `translate` | Translates texts in your adapter to all required languages, see [`@iobroker/adapter-dev`](https://github.com/ioBroker/adapter-dev#manage-translations) for more details. |
-| `release` | Creates a new release, see [`@alcalzone/release-script`](https://github.com/AlCalzone/release-script#usage) for more details. |
+| Field | Description |
+|-------|-------------|
+| E-Mail | The e-mail address to check |
 
-### Configuring the compilation
-The adapter template uses [esbuild](https://esbuild.github.io/) to compile TypeScript and/or React code. You can configure many compilation settings 
-either in `tsconfig.json` or by changing options for the build tasks. These options are described in detail in the
-[`@iobroker/adapter-dev` documentation](https://github.com/ioBroker/adapter-dev#compile-adapter-files).
+### Settings tab
 
-### Writing tests
-When done right, testing code is invaluable, because it gives you the 
-confidence to change your code while knowing exactly if and when 
-something breaks. A good read on the topic of test-driven development 
-is https://hackernoon.com/introduction-to-test-driven-development-tdd-61a13bc92d92. 
-Although writing tests before the code might seem strange at first, but it has very 
-clear upsides.
+| Setting | Description | Default |
+|---------|-------------|---------|
+| Interval | How often to check for new breaches | 24 hours |
+| Theme | Light or dark visualisation | Light |
+| Background transparency | Outer container opacity (0 = fully transparent) | 100% |
+| Card transparency | Individual entry card opacity | 100% |
+| Font size | Text size in the visualisation | 14 px |
 
-The template provides you with basic tests for the adapter startup and package files.
-It is recommended that you add your own tests into the mix.
+## Data points
 
-### Publishing the adapter
-Using GitHub Actions, you can enable automatic releases on npm whenever you push a new git tag that matches the form 
-`v<major>.<minor>.<patch>`. We **strongly recommend** that you do. The necessary steps are described in `.github/workflows/test-and-release.yml`.
+The adapter creates data points under `pwned-check.<instance>`.
 
-Since you installed the release script, you can create a new
-release simply by calling:
-```bash
-npm run release
-```
-Additional command line options for the release script are explained in the
-[release-script documentation](https://github.com/AlCalzone/release-script#command-line).
+### Passwords
 
-To get your adapter released in ioBroker, please refer to the documentation 
-of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#requirements-for-adapter-to-get-added-to-the-latest-repository).
+| Data point | Type | Description |
+|-----------|------|-------------|
+| `passwords.<id>.isPwned` | boolean | `true` if found in a breach |
+| `passwords.<id>.leakCount` | number | Number of times found in breach databases |
+| `passwords.<id>.lastCheck` | string | ISO timestamp of last successful check |
 
-### Test the adapter manually on a local ioBroker installation
-In order to install the adapter locally without publishing, the following steps are recommended:
-1. Create a GitHub repository for your adapter if you haven't already
-1. Push your code to the GitHub repository
-1. Use the ioBroker Admin interface or command line to install the adapter from GitHub:
-	* **Via Admin UI**: Go to the "Adapters" tab, click on "Custom Install" (GitHub icon), and enter your repository URL:
-		```
-		https://github.com/ipod86/ioBroker.pwned-check
-		```
-		You can also install from a specific branch by adding `#branchname` at the end:
-		```
-		https://github.com/ipod86/ioBroker.pwned-check#dev
-		```
-	* **Via Command Line**: Install using the `iob` command:
-		```bash
-		iob url https://github.com/ipod86/ioBroker.pwned-check
-		```
-		Or from a specific branch:
-		```bash
-		iob url https://github.com/ipod86/ioBroker.pwned-check#dev
-		```
+### E-Mails
 
-For later updates:
-1. Push your changes to GitHub
-1. Repeat the installation steps above (via Admin UI or `iob url` command) to update the adapter
+| Data point | Type | Description |
+|-----------|------|-------------|
+| `emails.<id>.isPwned` | boolean | `true` if found in a breach |
+| `emails.<id>.lastCheck` | string | ISO timestamp of last successful check |
+| `emails.<id>.leaks.<service>` | boolean | `true` for each breach source found |
+
+### Other
+
+| Data point | Type | Description |
+|-----------|------|-------------|
+| `visualisation` | string | HTML snippet for use in VIS or ioBroker.vis-2 |
+| `info.connection` | boolean | `true` while a check is running |
+
+## Privacy
+
+- Passwords are **never** stored in plaintext — only their SHA-1 hash
+- Password hashes are checked using the HIBP **k-anonymity** method: only the first 5 hex characters of the hash are transmitted; the full hash never leaves your system
+- E-mail addresses are sent to the XposedOrNot API over HTTPS
 
 ## Changelog
-<!--
-	Placeholder for the next version (at the beginning of the line):
-	### **WORK IN PROGRESS**
--->
 
-### **WORK IN PROGRESS**
-* (David G.) initial release
+### 0.0.1 (2026-04-06)
+- Initial release
 
 ## License
+
 MIT License
 
 Copyright (c) 2026 David G. <david@graef.email>
