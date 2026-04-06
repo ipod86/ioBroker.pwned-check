@@ -34,5 +34,7 @@
     "visualisation": "Wizualizacja",
     "bgOpacity": "Przezroczystość tła",
     "cardOpacity": "Przezroczystość karty",
-    "fontSize": "Rozmiar czcionki"
+    "fontSize": "Rozmiar czcionki",
+    "cardColor": "Kolor karty",
+    "compactView": "Widok kompaktowy"
 }

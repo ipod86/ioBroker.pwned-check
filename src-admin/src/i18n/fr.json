@@ -34,5 +34,7 @@
     "visualisation": "Visualisation",
     "bgOpacity": "Transparence du fond",
     "cardOpacity": "Transparence des cartes",
-    "fontSize": "Taille de police"
+    "fontSize": "Taille de police",
+    "cardColor": "Couleur de carte",
+    "compactView": "Vue compacte"
 }

@@ -34,5 +34,7 @@
     "visualisation": "可视化",
     "bgOpacity": "背景透明度",
     "cardOpacity": "卡片透明度",
-    "fontSize": "字体大小"
+    "fontSize": "字体大小",
+    "cardColor": "卡片颜色",
+    "compactView": "紧凑视图"
 }

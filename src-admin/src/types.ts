@@ -17,4 +17,6 @@ export interface PwnedCheckConfig {
     bgOpacity: number;
     cardOpacity: number;
     fontSize: number;
+    cardColor: string;
+    compactView: boolean;
 }

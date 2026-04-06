@@ -3,10 +3,13 @@ import {
     Box,
     Divider,
     FormControl,
+    FormControlLabel,
     InputLabel,
     MenuItem,
     Select,
     Slider,
+    Switch,
+    TextField,
     Typography,
 } from '@mui/material';
 import { I18n } from '@iobroker/adapter-react-v5';
@@ -114,6 +117,34 @@ const SettingsPanel: React.FC<Props> = ({ native, onChange }) => {
                             ]}
                         />
                     </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Typography variant="body2">{I18n.t('cardColor')}</Typography>
+                        <input
+                            type="color"
+                            value={native.cardColor || '#ffffff'}
+                            onChange={e => update('cardColor', e.target.value)}
+                            style={{ width: 48, height: 32, border: 'none', cursor: 'pointer', borderRadius: 4 }}
+                        />
+                        {native.cardColor && (
+                            <TextField
+                                size="small"
+                                value={native.cardColor}
+                                onChange={e => update('cardColor', e.target.value)}
+                                sx={{ width: 100 }}
+                            />
+                        )}
+                    </Box>
+
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={native.compactView ?? false}
+                                onChange={e => update('compactView', e.target.checked)}
+                            />
+                        }
+                        label={I18n.t('compactView')}
+                    />
                 </Box>
             </Box>
 

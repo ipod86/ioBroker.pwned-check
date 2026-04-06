@@ -24,6 +24,8 @@ interface AdapterConfig {
 	bgOpacity: number;
 	cardOpacity: number;
 	fontSize: number;
+	cardColor: string;
+	compactView: boolean;
 }
 
 type Lang = "en" | "de" | "ru" | "pt" | "nl" | "fr" | "it" | "es" | "pl" | "uk" | "zh-cn";
@@ -121,7 +123,7 @@ function normalizeId(str: string): string {
  * @param url - The URL to GET
  * @returns Response body as string
  */
-async function httpsGet(url: string): Promise<string> {
+async function httpsGet(url: string, attempt = 1): Promise<string> {
 	const controller = new AbortController();
 	const timer = setTimeout(() => controller.abort(), 15000);
 	try {
@@ -132,12 +134,24 @@ async function httpsGet(url: string): Promise<string> {
 		return await res.text();
 	} catch (err: any) {
 		if (err?.name === "AbortError") {
+			if (attempt < 2) {
+				await sleep(3000);
+				return httpsGet(url, attempt + 1);
+			}
 			throw new Error("Request timed out");
 		}
 		throw err;
 	} finally {
 		clearTimeout(timer);
 	}
+}
+
+function sleep(ms: number): Promise<void> {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function isValidEmail(email: string): boolean {
+	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 class PwnedCheck extends utils.Adapter {
@@ -235,15 +249,33 @@ class PwnedCheck extends utils.Adapter {
 				continue;
 			}
 			await this.checkPasswordEntry(entry);
+			await sleep(1000);
 		}
 
 		for (const entry of emails) {
-			if (!entry.email) {
-				this.log.warn(`Email entry "${entry.email}" has no email, skipping`);
+			if (!isValidEmail(entry.email)) {
+				this.log.warn(`Email entry "${entry.email}" has invalid format, skipping`);
 				continue;
 			}
 			await this.checkEmailEntry(entry);
+			await sleep(1000);
 		}
+
+		// Update global anyPwned status
+		const anyPwned = [...this.prevState.values()].some(s => s.isPwned);
+		await this.setObjectNotExistsAsync("info.anyPwned", {
+			type: "state",
+			common: {
+				name: "Any entry pwned",
+				role: "indicator.alarm",
+				type: "boolean",
+				read: true,
+				write: false,
+				def: false,
+			},
+			native: {},
+		});
+		await this.setStateAsync("info.anyPwned", { val: anyPwned, ack: true });
 
 		await this.updateVisualisation(config);
 	}
@@ -371,9 +403,9 @@ class PwnedCheck extends utils.Adapter {
 
 		try {
 			const body = await httpsGet(
-				`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(entry.email)}`,
+				`https://api.xposedornot.com/v1/breach-analytics?email=${encodeURIComponent(entry.email)}`,
 			);
-			let parsed: { breaches?: string[][]; status?: string; Error?: string };
+			let parsed: { ExposedBreaches?: { breaches_details?: Array<{ breach: string; xposed_date?: string }> }; Error?: string };
 			try {
 				parsed = JSON.parse(body);
 			} catch {
@@ -381,21 +413,22 @@ class PwnedCheck extends utils.Adapter {
 				return;
 			}
 
-			let breachList: string[] = [];
+			// Map breach name → year
+			const breachMap = new Map<string, string>();
 			let isPwned = false;
 
 			if (parsed.Error === "Not found") {
 				isPwned = false;
-				breachList = [];
-			} else if (parsed.status === "success" && Array.isArray(parsed.breaches)) {
-				// breaches is array of arrays: [["Dropbox","LinkedIn"]]
-				for (const group of parsed.breaches) {
-					if (Array.isArray(group)) {
-						breachList.push(...group);
+			} else if (parsed.ExposedBreaches?.breaches_details) {
+				for (const detail of parsed.ExposedBreaches.breaches_details) {
+					if (detail.breach) {
+						breachMap.set(detail.breach, detail.xposed_date ?? "");
 					}
 				}
-				isPwned = breachList.length > 0;
+				isPwned = breachMap.size > 0;
 			}
+
+			const breachList = [...breachMap.keys()];
 
 			// Ensure objects exist
 			await this.setObjectNotExistsAsync(`emails.${safeId}`, {
@@ -432,13 +465,14 @@ class PwnedCheck extends utils.Adapter {
 			await this.setStateAsync(`emails.${safeId}.lastCheck`, { val: now, ack: true });
 
 			if (isPwned) {
-				// Create/update per-breach leak DPs
-				for (const service of breachList) {
+				// Create/update per-breach leak DPs (with year in name)
+				for (const [service, year] of breachMap) {
 					const safeService = normalizeId(service);
-					await this.setObjectNotExistsAsync(`emails.${safeId}.leaks.${safeService}`, {
+					const dpName = year ? `${service} (${year})` : service;
+					await this.extendObjectAsync(`emails.${safeId}.leaks.${safeService}`, {
 						type: "state",
 						common: {
-							name: service,
+							name: dpName,
 							role: "indicator",
 							type: "boolean",
 							read: true,
@@ -604,17 +638,34 @@ class PwnedCheck extends utils.Adapter {
 		const bgOpacity = config.bgOpacity ?? 100;
 		const cardOpacity = config.cardOpacity ?? 100;
 		const fontSize = config.fontSize ?? 14;
+		const cardColor = config.cardColor ?? "";
+		const compactView = config.compactView ?? false;
 
 		const isDark = theme === "dark";
 
 		const bgRgb = isDark ? "26,26,46" : "245,245,245";
-		const cardRgb = isDark ? "22,33,62" : "255,255,255";
 		const textColor = isDark ? "#e0e0e0" : "#212121";
 		const borderColor = isDark ? "#0f3460" : "#e0e0e0";
 
 		const bgColor = `rgba(${bgRgb},${(bgOpacity / 100).toFixed(2)})`;
-		const safeCardBg = `rgba(${cardRgb},${(cardOpacity / 100).toFixed(2)})`;
+
+		// Card background: custom color > theme default
+		let safeCardBg: string;
+		if (cardColor) {
+			const hex = cardColor.replace("#", "");
+			const r = parseInt(hex.substring(0, 2), 16);
+			const g = parseInt(hex.substring(2, 4), 16);
+			const b = parseInt(hex.substring(4, 6), 16);
+			safeCardBg = `rgba(${r},${g},${b},${(cardOpacity / 100).toFixed(2)})`;
+		} else {
+			const cardRgb = isDark ? "22,33,62" : "255,255,255";
+			safeCardBg = `rgba(${cardRgb},${(cardOpacity / 100).toFixed(2)})`;
+		}
+
 		const safeTextColor = textColor;
+
+		const lastUpdateMs = Date.now();
+		const lastUpdateStr = new Date(lastUpdateMs).toLocaleString();
 
 		// Gather current states for passwords
 		const pwCards: string[] = [];
@@ -637,14 +688,18 @@ class PwnedCheck extends utils.Adapter {
 				: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
 
 			const statusColor = isPwned ? "#e53935" : "#43a047";
-			const statusText = isPwned ? `PWNED (${leakCount} breaches)` : "SAFE";
+			const statusText = isPwned ? `PWNED (${leakCount}×)` : "SAFE";
 
-			pwCards.push(`
-				<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
+			pwCards.push(compactView
+				? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+					${lockSvg}
+					<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.description)}</div>
+				</div>`
+				: `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
 					${lockSvg}
 					<div>
-						<div style="font-weight:600;font-size:14px;color:${safeTextColor};">${escapeHtml(entry.description)}</div>
-						<div style="font-size:12px;color:${statusColor};font-weight:500;">${statusText}</div>
+						<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.description)}</div>
+						<div style="font-size:0.85em;color:${statusColor};font-weight:500;">${statusText}</div>
 					</div>
 				</div>`);
 		}
@@ -681,15 +736,18 @@ class PwnedCheck extends utils.Adapter {
 				: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
 
 			const statusColor = isPwned ? "#e53935" : "#43a047";
-			const statusText = isPwned ? `PWNED (${breachNames.join(", ") || "unknown"})` : "SAFE";
+			const statusText = isPwned ? `PWNED (${breachNames.length}×)` : "SAFE";
 
-			emailCards.push(`
-				<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
+			emailCards.push(compactView
+				? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+					${lockSvg}
+					<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.email)}</div>
+				</div>`
+				: `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
 					${lockSvg}
 					<div>
-						<div style="font-weight:600;font-size:14px;color:${safeTextColor};">${escapeHtml(entry.email)}</div>
-						<div style="font-size:11px;color:#888;">${escapeHtml(entry.email)}</div>
-						<div style="font-size:12px;color:${statusColor};font-weight:500;">${statusText}</div>
+						<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.email)}</div>
+						<div style="font-size:0.85em;color:${statusColor};font-weight:500;">${statusText}</div>
 					</div>
 				</div>`);
 		}
@@ -699,7 +757,8 @@ class PwnedCheck extends utils.Adapter {
 	<h3 style="margin:0 0 12px 0;color:${safeTextColor};">Pwned Check</h3>
 	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">Passwords</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
 	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">E-Mails</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">${emailCards.join("")}</div>` : ""}
-	${passwords.length === 0 && emails.length === 0 ? `<div style="color:#888;font-size:13px;">No entries configured.</div>` : ""}
+	${passwords.length === 0 && emails.length === 0 ? `<div style="color:#888;font-size:0.9em;">No entries configured.</div>` : ""}
+	<div style="font-size:0.8em;color:#888;margin-top:10px;">Last check: ${lastUpdateStr}</div>
 </div>`;
 
 		await this.setStateAsync("visualisation", { val: html, ack: true });

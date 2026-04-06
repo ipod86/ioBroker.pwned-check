@@ -34,5 +34,7 @@
     "visualisation": "Visualización",
     "bgOpacity": "Transparencia del fondo",
     "cardOpacity": "Transparencia de tarjeta",
-    "fontSize": "Tamaño de fuente"
+    "fontSize": "Tamaño de fuente",
+    "cardColor": "Color de tarjeta",
+    "compactView": "Vista compacta"
 }

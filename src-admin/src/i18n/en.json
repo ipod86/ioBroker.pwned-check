@@ -35,5 +35,7 @@
     "checkError": "Error triggering check.",
     "strengthWeak": "Weak",
     "strengthMedium": "Medium",
-    "strengthGood": "Good"
+    "strengthGood": "Good",
+    "cardColor": "Card color",
+    "compactView": "Compact view"
 }

@@ -35,5 +35,7 @@
     "checkError": "Fehler beim Auslösen der Prüfung.",
     "strengthWeak": "Schwach",
     "strengthMedium": "Mittel",
-    "strengthGood": "Gut"
+    "strengthGood": "Gut",
+    "cardColor": "Kartenfarbe",
+    "compactView": "Kompakte Ansicht"
 }

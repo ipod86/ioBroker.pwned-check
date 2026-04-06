@@ -34,5 +34,7 @@
     "visualisation": "Visualisatie",
     "bgOpacity": "Achtergrondtransparantie",
     "cardOpacity": "Kaarttransparantie",
-    "fontSize": "Lettergrootte"
+    "fontSize": "Lettergrootte",
+    "cardColor": "Kaartkleur",
+    "compactView": "Compacte weergave"
 }

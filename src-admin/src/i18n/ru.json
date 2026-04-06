@@ -34,5 +34,7 @@
     "visualisation": "Визуализация",
     "bgOpacity": "Прозрачность фона",
     "cardOpacity": "Прозрачность карточки",
-    "fontSize": "Размер шрифта"
+    "fontSize": "Размер шрифта",
+    "cardColor": "Цвет карточки",
+    "compactView": "Компактный вид"
 }

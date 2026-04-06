@@ -127,7 +127,9 @@
 		"theme": "light",
 		"bgOpacity": 100,
 		"cardOpacity": 100,
-		"fontSize": 14
+		"fontSize": 14,
+		"cardColor": "",
+		"compactView": false
 	},
 	"objects": [],
 	"instanceObjects": [
