@@ -21,7 +21,7 @@
     "url": "https://github.com/ipod86/ioBroker.pwned-check.git"
   },
   "engines": {
-    "node": ">= 22"
+    "node": ">= 18"
   },
   "dependencies": {
     "@iobroker/adapter-core": "^3.3.2"
