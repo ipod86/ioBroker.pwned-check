@@ -121,6 +121,7 @@ function normalizeId(str: string): string {
  * Performs an HTTPS GET request and returns the response body
  *
  * @param url - The URL to GET
+ * @param attempt - Current attempt number (for retry logic)
  * @returns Response body as string
  */
 async function httpsGet(url: string, attempt = 1): Promise<string> {
@@ -405,7 +406,10 @@ class PwnedCheck extends utils.Adapter {
 			const body = await httpsGet(
 				`https://api.xposedornot.com/v1/breach-analytics?email=${encodeURIComponent(entry.email)}`,
 			);
-			let parsed: { ExposedBreaches?: { breaches_details?: Array<{ breach: string; xposed_date?: string }> }; Error?: string };
+			let parsed: {
+				ExposedBreaches?: { breaches_details?: Array<{ breach: string; xposed_date?: string }> };
+				Error?: string;
+			};
 			try {
 				parsed = JSON.parse(body);
 			} catch {
@@ -692,18 +696,20 @@ class PwnedCheck extends utils.Adapter {
 			const statusColor = isPwned ? "#e53935" : "#43a047";
 			const statusText = isPwned ? `PWNED (${leakCount}×)` : "SAFE";
 
-			pwCards.push(compactView
-				? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+			pwCards.push(
+				compactView
+					? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 					${lockSvg}
 					<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.description)}</div>
 				</div>`
-				: `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
+					: `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
 					${lockSvg}
 					<div>
 						<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.description)}</div>
 						<div style="font-size:0.85em;color:${statusColor};font-weight:500;">${statusText}</div>
 					</div>
-				</div>`);
+				</div>`,
+			);
 		}
 
 		// Gather current states for emails
@@ -740,18 +746,20 @@ class PwnedCheck extends utils.Adapter {
 			const statusColor = isPwned ? "#e53935" : "#43a047";
 			const statusText = isPwned ? `PWNED (${breachNames.length}×)` : "SAFE";
 
-			emailCards.push(compactView
-				? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+			emailCards.push(
+				compactView
+					? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 					${lockSvg}
 					<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.email)}</div>
 				</div>`
-				: `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
+					: `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
 					${lockSvg}
 					<div>
 						<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.email)}</div>
 						<div style="font-size:0.85em;color:${statusColor};font-weight:500;">${statusText}</div>
 					</div>
-				</div>`);
+				</div>`,
+			);
 		}
 
 		const html = `
