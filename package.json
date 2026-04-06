@@ -1,6 +1,6 @@
 {
   "name": "iobroker.pwned-check",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Check passwords and emails against breach databases (HIBP, XposedOrNot)",
   "author": {
     "name": "ipod86",
