@@ -1,6 +1,7 @@
 import React from 'react';
 import { GenericApp, I18n, Loader } from '@iobroker/adapter-react-v5';
 import type { GenericAppProps, GenericAppState } from '@iobroker/adapter-react-v5';
+import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import { Box, Tab, Tabs } from '@mui/material';
 import PasswordsTable from './components/PasswordsTable';
 import EmailsTable from './components/EmailsTable';
@@ -47,6 +48,8 @@ class App extends GenericApp<GenericAppProps, AppState> {
 		const native = this.getNative();
 
 		return (
+			<StyledEngineProvider injectFirst>
+				<ThemeProvider theme={this.state.theme}>
 			<div className="App">
 				<Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2, mx: 2, mt: 1 }}>
 					<Tabs value={this.state.tab} onChange={(_e, v: number) => this.setState({ tab: v })}>
@@ -86,6 +89,8 @@ class App extends GenericApp<GenericAppProps, AppState> {
 				{this.renderError()}
 				{this.renderSaveCloseButtons()}
 			</div>
+				</ThemeProvider>
+			</StyledEngineProvider>
 		);
 	}
 }
