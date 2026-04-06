@@ -106,23 +106,59 @@
 			"scope": "pwned-check",
 			"name": {
 				"en": "Pwned Check",
-				"de": "Pwned Check"
+				"de": "Pwned Check",
+				"ru": "Pwned Check",
+				"pt": "Pwned Check",
+				"nl": "Pwned Check",
+				"fr": "Pwned Check",
+				"it": "Pwned Check",
+				"es": "Pwned Check",
+				"pl": "Pwned Check",
+				"uk": "Pwned Check",
+				"zh-cn": "Pwned Check"
 			},
 			"description": {
 				"en": "Security notifications from the pwned-check adapter",
-				"de": "Sicherheitsbenachrichtigungen vom pwned-check Adapter"
+				"de": "Sicherheitsbenachrichtigungen vom pwned-check Adapter",
+				"ru": "Уведомления безопасности от адаптера pwned-check",
+				"pt": "Notificações de segurança do adaptador pwned-check",
+				"nl": "Beveiligingsmeldingen van de pwned-check adapter",
+				"fr": "Notifications de sécurité de l'adaptateur pwned-check",
+				"it": "Notifiche di sicurezza dall'adattatore pwned-check",
+				"es": "Notificaciones de seguridad del adaptador pwned-check",
+				"pl": "Powiadomienia bezpieczeństwa z adaptera pwned-check",
+				"uk": "Сповіщення безпеки від адаптера pwned-check",
+				"zh-cn": "来自 pwned-check 适配器的安全通知"
 			},
 			"categories": [
 				{
 					"category": "breach",
 					"name": {
 						"en": "Data breach detected",
-						"de": "Datenleck erkannt"
+						"de": "Datenleck erkannt",
+						"ru": "Обнаружена утечка данных",
+						"pt": "Violação de dados detectada",
+						"nl": "Datalek gedetecteerd",
+						"fr": "Fuite de données détectée",
+						"it": "Violazione dei dati rilevata",
+						"es": "Filtración de datos detectada",
+						"pl": "Wykryto naruszenie danych",
+						"uk": "Виявлено витік даних",
+						"zh-cn": "检测到数据泄露"
 					},
 					"severity": "alert",
 					"description": {
 						"en": "A password or e-mail address was found in a data breach.",
-						"de": "Ein Passwort oder eine E-Mail-Adresse wurde in einem Datenleck gefunden."
+						"de": "Ein Passwort oder eine E-Mail-Adresse wurde in einem Datenleck gefunden.",
+						"ru": "Пароль или адрес электронной почты обнаружен в утечке данных.",
+						"pt": "Uma senha ou endereço de e-mail foi encontrado em uma violação de dados.",
+						"nl": "Een wachtwoord of e-mailadres werd gevonden in een datalek.",
+						"fr": "Un mot de passe ou une adresse e-mail a été trouvé dans une fuite de données.",
+						"it": "Una password o un indirizzo e-mail è stato trovato in una violazione dei dati.",
+						"es": "Se encontró una contraseña o dirección de correo electrónico en una filtración de datos.",
+						"pl": "Hasło lub adres e-mail zostało znalezione w naruszeniu danych.",
+						"uk": "Пароль або адреса електронної пошти виявлені у витоку даних.",
+						"zh-cn": "在数据泄露中发现了密码或电子邮件地址。"
 					},
 					"regex": [],
 					"limit": 10
