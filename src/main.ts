@@ -465,23 +465,25 @@ class PwnedCheck extends utils.Adapter {
 			await this.setStateAsync(`emails.${safeId}.lastCheck`, { val: now, ack: true });
 
 			if (isPwned) {
-				// Create/update per-breach leak DPs (with year in name)
+				// Create/update per-breach leak DPs — value is the breach year (or "unknown")
 				for (const [service, year] of breachMap) {
 					const safeService = normalizeId(service);
-					const dpName = year ? `${service} (${year})` : service;
 					await this.extendObjectAsync(`emails.${safeId}.leaks.${safeService}`, {
 						type: "state",
 						common: {
-							name: dpName,
-							role: "indicator",
-							type: "boolean",
+							name: service,
+							role: "text",
+							type: "string",
 							read: true,
 							write: false,
-							def: false,
+							def: "",
 						},
 						native: {},
 					});
-					await this.setStateAsync(`emails.${safeId}.leaks.${safeService}`, { val: true, ack: true });
+					await this.setStateAsync(`emails.${safeId}.leaks.${safeService}`, {
+						val: year || "unknown",
+						ack: true,
+					});
 				}
 			} else {
 				// Delete all .leaks.* children

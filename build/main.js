@@ -396,20 +396,22 @@ class PwnedCheck extends utils.Adapter {
       if (isPwned) {
         for (const [service, year] of breachMap) {
           const safeService = normalizeId(service);
-          const dpName = year ? `${service} (${year})` : service;
           await this.extendObjectAsync(`emails.${safeId}.leaks.${safeService}`, {
             type: "state",
             common: {
-              name: dpName,
-              role: "indicator",
-              type: "boolean",
+              name: service,
+              role: "text",
+              type: "string",
               read: true,
               write: false,
-              def: false
+              def: ""
             },
             native: {}
           });
-          await this.setStateAsync(`emails.${safeId}.leaks.${safeService}`, { val: true, ack: true });
+          await this.setStateAsync(`emails.${safeId}.leaks.${safeService}`, {
+            val: year || "unknown",
+            ack: true
+          });
         }
       } else {
         await this.deleteLeakChildren(safeId);
