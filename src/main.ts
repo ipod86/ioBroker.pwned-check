@@ -173,6 +173,9 @@ class PwnedCheck extends utils.Adapter {
 
 		const config = this.config as unknown as AdapterConfig;
 
+		// Load previous isPwned states to avoid re-notifying on restart
+		await this.loadPrevState(config);
+
 		// Clean up orphaned objects from removed config entries
 		await this.cleanupOrphanedObjects(config);
 
@@ -328,38 +331,26 @@ class PwnedCheck extends utils.Adapter {
 				if (!prev?.isPwned) {
 					// Newly pwned
 					this.log.warn(`Password for "${entry.description}" found in ${leakCount} breaches!`);
-					try {
-						(this as any).registerNotification(
-							"system",
-							"securityIssues",
-							t("pwFound", this.lang, { s: entry.description, n: leakCount }),
-						);
-					} catch {
-						/* notifications may not be available in all environments */
-					}
+					await this.registerNotification(
+						"pwned-check",
+						"breach",
+						t("pwFound", this.lang, { s: entry.description, n: leakCount }),
+					);
 				} else if (prev.leakCount !== undefined && leakCount > prev.leakCount) {
-					try {
-						(this as any).registerNotification(
-							"system",
-							"securityIssues",
-							t("pwIncreased", this.lang, { s: entry.description, n: leakCount, p: prev.leakCount }),
-						);
-					} catch {
-						/* ignore */
-					}
+					await this.registerNotification(
+						"pwned-check",
+						"breach",
+						t("pwIncreased", this.lang, { s: entry.description, n: leakCount, p: prev.leakCount }),
+					);
 				}
 			} else if (prev?.isPwned) {
 				// Cleared!
 				this.log.info(`Password for "${entry.description}" is no longer found in breaches.`);
-				try {
-					(this as any).registerNotification(
-						"system",
-						"securityIssues",
-						t("pwCleared", this.lang, { s: entry.description }),
-					);
-				} catch {
-					/* ignore */
-				}
+				await this.registerNotification(
+					"pwned-check",
+					"breach",
+					t("pwCleared", this.lang, { s: entry.description }),
+				);
 			}
 
 			this.prevState.set(prevKey, { isPwned, leakCount });
@@ -472,31 +463,23 @@ class PwnedCheck extends utils.Adapter {
 					this.log.warn(
 						`Email "${entry.email}" found in ${breachList.length} breach(es): ${breachList.join(", ")}`,
 					);
-					try {
-						(this as any).registerNotification(
-							"system",
-							"securityIssues",
-							t("emailFound", this.lang, {
-								s: entry.email,
-								n: breachList.length,
-								b: breachList.join(", "),
-							}),
-						);
-					} catch {
-						/* ignore */
-					}
+					await this.registerNotification(
+						"pwned-check",
+						"breach",
+						t("emailFound", this.lang, {
+							s: entry.email,
+							n: breachList.length,
+							b: breachList.join(", "),
+						}),
+					);
 				}
 			} else if (prev?.isPwned) {
 				this.log.info(`Email "${entry.email}" is no longer found in breaches.`);
-				try {
-					(this as any).registerNotification(
-						"system",
-						"securityIssues",
-						t("emailCleared", this.lang, { s: entry.email }),
-					);
-				} catch {
-					/* ignore */
-				}
+				await this.registerNotification(
+					"pwned-check",
+					"breach",
+					t("emailCleared", this.lang, { s: entry.email }),
+				);
 			}
 
 			this.prevState.set(prevKey, { isPwned });
@@ -533,6 +516,35 @@ class PwnedCheck extends utils.Adapter {
 	 *
 	 * @param config - Current adapter configuration
 	 */
+	private async loadPrevState(config: AdapterConfig): Promise<void> {
+		for (const entry of config.passwords ?? []) {
+			const safeId = normalizeId(entry.description);
+			try {
+				const isPwnedState = await this.getStateAsync(`passwords.${safeId}.isPwned`);
+				const leakCountState = await this.getStateAsync(`passwords.${safeId}.leakCount`);
+				if (isPwnedState != null) {
+					this.prevState.set(`password:${safeId}`, {
+						isPwned: isPwnedState.val === true,
+						leakCount: typeof leakCountState?.val === "number" ? leakCountState.val : 0,
+					});
+				}
+			} catch {
+				// DP may not exist yet on first start
+			}
+		}
+		for (const entry of config.emails ?? []) {
+			const safeId = normalizeId(entry.email);
+			try {
+				const isPwnedState = await this.getStateAsync(`emails.${safeId}.isPwned`);
+				if (isPwnedState != null) {
+					this.prevState.set(`email:${safeId}`, { isPwned: isPwnedState.val === true });
+				}
+			} catch {
+				// ignore
+			}
+		}
+	}
+
 	private async cleanupOrphanedObjects(config: AdapterConfig): Promise<void> {
 		const configPasswordIds = new Set((config.passwords ?? []).map(p => normalizeId(p.description)));
 		const configEmailIds = new Set((config.emails ?? []).map(e => normalizeId(e.email)));
