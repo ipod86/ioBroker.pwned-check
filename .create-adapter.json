@@ -4,7 +4,7 @@
 	"adapterName": "pwned-check",
 	"title": "Pwned Check",
 	"description": "Check passwords and emails against breach databases (HIBP, XposedOrNot)",
-	"authorName": "David G.",
+	"authorName": "ipod86",
 	"authorEmail": "david@graef.email",
 	"authorGithub": "ipod86",
 	"language": "TypeScript",
