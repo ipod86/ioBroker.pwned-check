@@ -48,7 +48,7 @@ class App extends GenericApp<GenericAppProps, AppState> {
 
 		return (
 			<div className="App">
-				<Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+				<Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2, mx: 2, mt: 1 }}>
 					<Tabs value={this.state.tab} onChange={(_e, v: number) => this.setState({ tab: v })}>
 						<Tab label={I18n.t('tabPasswords')} />
 						<Tab label={I18n.t('tabEmails')} />
@@ -56,6 +56,7 @@ class App extends GenericApp<GenericAppProps, AppState> {
 					</Tabs>
 				</Box>
 
+				<Box sx={{ px: 2 }}>
 				{this.state.tab === 0 && (
 					<PasswordsTable
 						passwords={native.passwords ?? []}
@@ -81,6 +82,7 @@ class App extends GenericApp<GenericAppProps, AppState> {
 					/>
 				)}
 
+				</Box>
 				{this.renderError()}
 				{this.renderSaveCloseButtons()}
 			</div>
