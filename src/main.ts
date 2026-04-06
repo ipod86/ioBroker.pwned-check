@@ -645,9 +645,9 @@ class PwnedCheck extends utils.Adapter {
 
 		const isDark = theme === "dark";
 
-		const bgRgb = isDark ? "26,26,46" : "245,245,245";
-		const textColor = isDark ? "#e0e0e0" : "#212121";
-		const borderColor = isDark ? "#0f3460" : "#e0e0e0";
+		const bgRgb = isDark ? "245,245,245" : "26,26,46";
+		const textColor = isDark ? "#212121" : "#e0e0e0";
+		const borderColor = isDark ? "#e0e0e0" : "#0f3460";
 
 		const bgColor = `rgba(${bgRgb},${(bgOpacity / 100).toFixed(2)})`;
 
@@ -660,7 +660,7 @@ class PwnedCheck extends utils.Adapter {
 			const b = parseInt(hex.substring(4, 6), 16);
 			safeCardBg = `rgba(${r},${g},${b},${(cardOpacity / 100).toFixed(2)})`;
 		} else {
-			const cardRgb = isDark ? "22,33,62" : "255,255,255";
+			const cardRgb = isDark ? "255,255,255" : "22,33,62";
 			safeCardBg = `rgba(${cardRgb},${(cardOpacity / 100).toFixed(2)})`;
 		}
 
