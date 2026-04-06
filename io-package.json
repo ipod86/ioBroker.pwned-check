@@ -95,7 +95,7 @@
 		"passwords": [],
 		"emails": [],
 		"checkInterval": 24,
-		"theme": "auto",
+		"theme": "light",
 		"bgOpacity": 100,
 		"cardOpacity": 100,
 		"fontSize": 14

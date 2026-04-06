@@ -55,11 +55,10 @@ const SettingsPanel: React.FC<Props> = ({ native, onChange }) => {
                     <FormControl sx={{ width: 200 }}>
                         <InputLabel>{I18n.t('theme')}</InputLabel>
                         <Select
-                            value={native.theme || 'auto'}
+                            value={native.theme || 'light'}
                             label={I18n.t('theme')}
                             onChange={e => update('theme', e.target.value)}
                         >
-                            <MenuItem value="auto">{I18n.t('themeAuto')}</MenuItem>
                             <MenuItem value="light">{I18n.t('themeLight')}</MenuItem>
                             <MenuItem value="dark">{I18n.t('themeDark')}</MenuItem>
                         </Select>

@@ -13,7 +13,7 @@ export interface PwnedCheckConfig {
     passwords: PasswordEntry[];
     emails: EmailEntry[];
     checkInterval: number;
-    theme: 'auto' | 'light' | 'dark';
+    theme: 'light' | 'dark';
     bgOpacity: number;
     cardOpacity: number;
     fontSize: number;

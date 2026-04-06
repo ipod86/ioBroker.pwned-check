@@ -91,7 +91,7 @@ const TRANSLATIONS = {
 };
 function t(key, lang, vars = {}) {
   var _a, _b, _c, _d, _e, _f, _g, _h;
-  const tpl = (_d = (_c = (_a = TRANSLATIONS[key]) == null ? void 0 : _a[lang]) != null ? _c : (_b = TRANSLATIONS[key]) == null ? void 0 : _b["en"]) != null ? _d : key;
+  const tpl = (_d = (_c = (_a = TRANSLATIONS[key]) == null ? void 0 : _a[lang]) != null ? _c : (_b = TRANSLATIONS[key]) == null ? void 0 : _b.en) != null ? _d : key;
   return tpl.replace("%s", (_e = vars.s) != null ? _e : "").replace("%n", String((_f = vars.n) != null ? _f : "")).replace("%p", String((_g = vars.p) != null ? _g : "")).replace("%b", (_h = vars.b) != null ? _h : "");
 }
 function normalizeId(str) {
@@ -107,7 +107,9 @@ async function httpsGet(url) {
     });
     return await res.text();
   } catch (err) {
-    if ((err == null ? void 0 : err.name) === "AbortError") throw new Error("Request timed out");
+    if ((err == null ? void 0 : err.name) === "AbortError") {
+      throw new Error("Request timed out");
+    }
     throw err;
   } finally {
     clearTimeout(timer);
@@ -135,7 +137,7 @@ class PwnedCheck extends utils.Adapter {
     try {
       const sysConfig = await this.getForeignObjectAsync("system.config");
       const syslang = (_a = sysConfig == null ? void 0 : sysConfig.common) == null ? void 0 : _a.language;
-      if (syslang && syslang in TRANSLATIONS["pwFound"]) {
+      if (syslang && syslang in TRANSLATIONS.pwFound) {
         this.lang = syslang;
       }
     } catch {
@@ -396,12 +398,18 @@ class PwnedCheck extends utils.Adapter {
       const prev = this.prevState.get(prevKey);
       if (isPwned) {
         if (!(prev == null ? void 0 : prev.isPwned)) {
-          this.log.warn(`Email "${entry.email}" found in ${breachList.length} breach(es): ${breachList.join(", ")}`);
+          this.log.warn(
+            `Email "${entry.email}" found in ${breachList.length} breach(es): ${breachList.join(", ")}`
+          );
           try {
             this.registerNotification(
               "system",
               "securityIssues",
-              t("emailFound", this.lang, { s: entry.email, n: breachList.length, b: breachList.join(", ") })
+              t("emailFound", this.lang, {
+                s: entry.email,
+                n: breachList.length,
+                b: breachList.join(", ")
+              })
             );
           } catch {
           }
@@ -498,11 +506,11 @@ class PwnedCheck extends utils.Adapter {
     var _a, _b, _c, _d, _e, _f;
     const passwords = (_a = config.passwords) != null ? _a : [];
     const emails = (_b = config.emails) != null ? _b : [];
-    const theme = (_c = config.theme) != null ? _c : "auto";
+    const theme = (_c = config.theme) != null ? _c : "light";
     const bgOpacity = (_d = config.bgOpacity) != null ? _d : 100;
     const cardOpacity = (_e = config.cardOpacity) != null ? _e : 100;
     const fontSize = (_f = config.fontSize) != null ? _f : 14;
-    const isDark = theme === "dark" || theme === "auto" && false;
+    const isDark = theme === "dark";
     const bgRgb = isDark ? "26,26,46" : "245,245,245";
     const cardRgb = isDark ? "22,33,62" : "255,255,255";
     const textColor = isDark ? "#e0e0e0" : "#212121";

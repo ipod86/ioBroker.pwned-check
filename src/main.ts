@@ -20,7 +20,7 @@ interface AdapterConfig {
 	passwords: PasswordEntry[];
 	emails: EmailEntry[];
 	checkInterval: number;
-	theme: "auto" | "light" | "dark";
+	theme: "light" | "dark";
 	bgOpacity: number;
 	cardOpacity: number;
 	fontSize: number;
@@ -87,7 +87,7 @@ const TRANSLATIONS: Record<string, Record<Lang, string>> = {
 		ru: '[pwned-check] Безопасность восстановлена: e-mail "%s" больше не найден в известных утечках.',
 		pt: '[pwned-check] Segurança restaurada: E-mail "%s" não encontrado em violações conhecidas.',
 		nl: '[pwned-check] Beveiliging hersteld: E-mail "%s" niet meer gevonden in bekende lekken.',
-		fr: '[pwned-check] Sécurité rétablie : l\'e-mail "%s" n\'est plus dans les fuites connues.',
+		fr: "[pwned-check] Sécurité rétablie : l'e-mail \"%s\" n'est plus dans les fuites connues.",
 		it: '[pwned-check] Sicurezza ripristinata: l\'e-mail "%s" non è più in violazioni note.',
 		es: '[pwned-check] Seguridad restablecida: el e-mail "%s" ya no aparece en filtraciones conocidas.',
 		pl: '[pwned-check] Bezpieczeństwo przywrócone: e-mail "%s" nie jest już w znanych wyciekach.',
@@ -97,7 +97,7 @@ const TRANSLATIONS: Record<string, Record<Lang, string>> = {
 };
 
 function t(key: string, lang: Lang, vars: { s?: string; n?: number; p?: number; b?: string } = {}): string {
-	const tpl = TRANSLATIONS[key]?.[lang] ?? TRANSLATIONS[key]?.["en"] ?? key;
+	const tpl = TRANSLATIONS[key]?.[lang] ?? TRANSLATIONS[key]?.en ?? key;
 	return tpl
 		.replace("%s", vars.s ?? "")
 		.replace("%n", String(vars.n ?? ""))
@@ -131,7 +131,9 @@ async function httpsGet(url: string): Promise<string> {
 		});
 		return await res.text();
 	} catch (err: any) {
-		if (err?.name === "AbortError") throw new Error("Request timed out");
+		if (err?.name === "AbortError") {
+			throw new Error("Request timed out");
+		}
 		throw err;
 	} finally {
 		clearTimeout(timer);
@@ -162,7 +164,7 @@ class PwnedCheck extends utils.Adapter {
 		try {
 			const sysConfig = await this.getForeignObjectAsync("system.config");
 			const syslang = (sysConfig?.common as any)?.language as string | undefined;
-			if (syslang && syslang in TRANSLATIONS["pwFound"]) {
+			if (syslang && syslang in TRANSLATIONS.pwFound) {
 				this.lang = syslang as Lang;
 			}
 		} catch {
@@ -327,22 +329,37 @@ class PwnedCheck extends utils.Adapter {
 					// Newly pwned
 					this.log.warn(`Password for "${entry.description}" found in ${leakCount} breaches!`);
 					try {
-						(this as any).registerNotification("system", "securityIssues",
-							t("pwFound", this.lang, { s: entry.description, n: leakCount }));
-					} catch { /* notifications may not be available in all environments */ }
+						(this as any).registerNotification(
+							"system",
+							"securityIssues",
+							t("pwFound", this.lang, { s: entry.description, n: leakCount }),
+						);
+					} catch {
+						/* notifications may not be available in all environments */
+					}
 				} else if (prev.leakCount !== undefined && leakCount > prev.leakCount) {
 					try {
-						(this as any).registerNotification("system", "securityIssues",
-							t("pwIncreased", this.lang, { s: entry.description, n: leakCount, p: prev.leakCount }));
-					} catch { /* ignore */ }
+						(this as any).registerNotification(
+							"system",
+							"securityIssues",
+							t("pwIncreased", this.lang, { s: entry.description, n: leakCount, p: prev.leakCount }),
+						);
+					} catch {
+						/* ignore */
+					}
 				}
 			} else if (prev?.isPwned) {
 				// Cleared!
 				this.log.info(`Password for "${entry.description}" is no longer found in breaches.`);
 				try {
-					(this as any).registerNotification("system", "securityIssues",
-						t("pwCleared", this.lang, { s: entry.description }));
-				} catch { /* ignore */ }
+					(this as any).registerNotification(
+						"system",
+						"securityIssues",
+						t("pwCleared", this.lang, { s: entry.description }),
+					);
+				} catch {
+					/* ignore */
+				}
 			}
 
 			this.prevState.set(prevKey, { isPwned, leakCount });
@@ -452,18 +469,34 @@ class PwnedCheck extends utils.Adapter {
 
 			if (isPwned) {
 				if (!prev?.isPwned) {
-					this.log.warn(`Email "${entry.email}" found in ${breachList.length} breach(es): ${breachList.join(", ")}`);
+					this.log.warn(
+						`Email "${entry.email}" found in ${breachList.length} breach(es): ${breachList.join(", ")}`,
+					);
 					try {
-						(this as any).registerNotification("system", "securityIssues",
-							t("emailFound", this.lang, { s: entry.email, n: breachList.length, b: breachList.join(", ") }));
-					} catch { /* ignore */ }
+						(this as any).registerNotification(
+							"system",
+							"securityIssues",
+							t("emailFound", this.lang, {
+								s: entry.email,
+								n: breachList.length,
+								b: breachList.join(", "),
+							}),
+						);
+					} catch {
+						/* ignore */
+					}
 				}
 			} else if (prev?.isPwned) {
 				this.log.info(`Email "${entry.email}" is no longer found in breaches.`);
 				try {
-					(this as any).registerNotification("system", "securityIssues",
-						t("emailCleared", this.lang, { s: entry.email }));
-				} catch { /* ignore */ }
+					(this as any).registerNotification(
+						"system",
+						"securityIssues",
+						t("emailCleared", this.lang, { s: entry.email }),
+					);
+				} catch {
+					/* ignore */
+				}
 			}
 
 			this.prevState.set(prevKey, { isPwned });
@@ -555,12 +588,12 @@ class PwnedCheck extends utils.Adapter {
 	private async updateVisualisation(config: AdapterConfig): Promise<void> {
 		const passwords = config.passwords ?? [];
 		const emails = config.emails ?? [];
-		const theme = config.theme ?? "auto";
+		const theme = config.theme ?? "light";
 		const bgOpacity = config.bgOpacity ?? 100;
 		const cardOpacity = config.cardOpacity ?? 100;
 		const fontSize = config.fontSize ?? 14;
 
-		const isDark = theme === "dark" || (theme === "auto" && false);
+		const isDark = theme === "dark";
 
 		const bgRgb = isDark ? "26,26,46" : "245,245,245";
 		const cardRgb = isDark ? "22,33,62" : "255,255,255";
