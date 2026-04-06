@@ -79,35 +79,6 @@
 		"supportedMessages": {
 			"notifications": true
 		},
-		"notifications": [
-			{
-				"scope": "pwned-check",
-				"name": {
-					"en": "Pwned Check",
-					"de": "Pwned Check"
-				},
-				"description": {
-					"en": "Security notifications from the pwned-check adapter",
-					"de": "Sicherheitsbenachrichtigungen vom pwned-check Adapter"
-				},
-				"categories": [
-					{
-						"category": "breach",
-						"name": {
-							"en": "Data breach detected",
-							"de": "Datenleck erkannt"
-						},
-						"severity": "alert",
-						"description": {
-							"en": "A password or e-mail address was found in a data breach.",
-							"de": "Ein Passwort oder eine E-Mail-Adresse wurde in einem Datenleck gefunden."
-						},
-						"regex": [],
-						"limit": 10
-					}
-				]
-			}
-		],
 		"dependencies": [
 			{
 				"js-controller": ">=6.0.11"
@@ -130,6 +101,35 @@
 		"cardColor": "",
 		"compactView": false
 	},
+	"notifications": [
+		{
+			"scope": "pwned-check",
+			"name": {
+				"en": "Pwned Check",
+				"de": "Pwned Check"
+			},
+			"description": {
+				"en": "Security notifications from the pwned-check adapter",
+				"de": "Sicherheitsbenachrichtigungen vom pwned-check Adapter"
+			},
+			"categories": [
+				{
+					"category": "breach",
+					"name": {
+						"en": "Data breach detected",
+						"de": "Datenleck erkannt"
+					},
+					"severity": "alert",
+					"description": {
+						"en": "A password or e-mail address was found in a data breach.",
+						"de": "Ein Passwort oder eine E-Mail-Adresse wurde in einem Datenleck gefunden."
+					},
+					"regex": [],
+					"limit": 10
+				}
+			]
+		}
+	],
 	"objects": [],
 	"instanceObjects": [
 		{
