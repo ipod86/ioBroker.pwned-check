@@ -63,10 +63,10 @@
 			"license": "MIT"
 		},
 		"platform": "Javascript/Node.js",
-		"icon": "pwned-check.png",
+		"icon": "pwned-check.svg",
 		"enabled": true,
-		"extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.pwned-check/main/admin/pwned-check.png",
-		"readme": "https://github.com/ioBroker/ioBroker.pwned-check/blob/main/README.md",
+		"extIcon": "https://raw.githubusercontent.com/ipod86/ioBroker.pwned-check/main/admin/pwned-check.svg",
+		"readme": "https://github.com/ipod86/ioBroker.pwned-check/blob/main/README.md",
 		"loglevel": "info",
 		"tier": 3,
 		"mode": "daemon",

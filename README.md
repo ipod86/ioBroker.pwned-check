@@ -1,4 +1,4 @@
-![Logo](admin/pwned-check.png)
+![Logo](admin/pwned-check.svg)
 
 # ioBroker.pwned-check
 
