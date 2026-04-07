@@ -102,9 +102,6 @@
 		"adminUI": {
 			"config": "materialize"
 		},
-		"supportedMessages": {
-			"notifications": true
-		},
 		"dependencies": [
 			{
 				"js-controller": ">=6.0.11"
