@@ -625,12 +625,12 @@ class PwnedCheck extends utils.Adapter {
 			await this.setStateAsync("system.pawns.lastCheck", { val: now, ack: true });
 
 			const prevKey = "system:pawns";
-			const prev = this.prevState.get(prevKey);
 
-			if (detected && !prev?.isPwned) {
+			if (detected) {
+				// Always notify — malware this severe warrants a notification on every check
 				this.log.warn("pawns-cli malware process detected on this system!");
 				await this.registerNotification("pwned-check", "breach", t("malwareDetected", this.lang));
-			} else if (!detected) {
+			} else {
 				this.log.debug("Malware check: pawns-cli not running.");
 			}
 
