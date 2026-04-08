@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "pwned-check",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "news": {
+      "0.0.4": {
+        "en": "Add pawns-cli malware detection: process check, /tmp file check, DPs, widget warning, notification with forum link",
+        "de": "pawns-cli Malware-Erkennung: Prozess-Check, /tmp-Datei-Check, Datenpunkte, Widget-Warnung, Benachrichtigung mit Forum-Link",
+        "ru": "Обнаружение вредоносного ПО pawns-cli: проверка процесса и файла /tmp, точки данных, предупреждение в виджете, уведомление со ссылкой на форум",
+        "pt": "Deteção de malware pawns-cli: verificação de processo e ficheiro /tmp, pontos de dados, aviso no widget, notificação com link do fórum",
+        "nl": "pawns-cli malwaredetectie: procescontrole, /tmp-bestandscontrole, datapunten, widgetwaarschuwing, melding met forumlink",
+        "fr": "Détection malware pawns-cli : vérification processus et fichier /tmp, points de données, avertissement widget, notification avec lien forum",
+        "it": "Rilevamento malware pawns-cli: controllo processo e file /tmp, punti dati, avviso widget, notifica con link forum",
+        "es": "Detección de malware pawns-cli: comprobación de proceso y archivo /tmp, puntos de datos, aviso en widget, notificación con enlace al foro",
+        "pl": "Wykrywanie malware pawns-cli: sprawdzanie procesu i pliku /tmp, punkty danych, ostrzeżenie widgetu, powiadomienie z linkiem do forum",
+        "uk": "Виявлення шкідливого ПЗ pawns-cli: перевірка процесу та файлу /tmp, точки даних, попередження у віджеті, сповіщення з посиланням на форум",
+        "zh-cn": "新增 pawns-cli 恶意软件检测：进程检测、/tmp 文件检测、数据点、widget 警告、含论坛链接的通知"
+      },
       "0.0.3": {
         "en": "Fix dark theme in admin UI",
         "de": "Dark-Theme in der Admin-Oberfläche korrigiert",
