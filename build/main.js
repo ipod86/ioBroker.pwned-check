@@ -21,6 +21,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
+var import_node_child_process = require("node:child_process");
 var utils = __toESM(require("@iobroker/adapter-core"));
 const TRANSLATIONS = {
   pwFound: {
@@ -74,6 +75,19 @@ const TRANSLATIONS = {
     pl: '[pwned-check] E-mail "%s" znaleziony w %n wycieku(ach): %b',
     uk: '[pwned-check] E-mail "%s" \u0437\u043D\u0430\u0439\u0434\u0435\u043D\u043E \u0432 %n \u0432\u0438\u0442\u043E\u043A\u0443(\u0430\u0445): %b',
     "zh-cn": '[pwned-check] \u90AE\u7BB1 "%s" \u5728 %n \u6B21\u6570\u636E\u6CC4\u9732\u4E2D\u53D1\u73B0\uFF1A%b'
+  },
+  malwareDetected: {
+    en: "[pwned-check] WARNING: pawns-cli malware process detected on this system! Your ioBroker may have been compromised.",
+    de: "[pwned-check] WARNUNG: pawns-cli Malware-Prozess auf diesem System entdeckt! Ihr ioBroker k\xF6nnte kompromittiert sein.",
+    ru: "[pwned-check] \u0412\u041D\u0418\u041C\u0410\u041D\u0418\u0415: \u043E\u0431\u043D\u0430\u0440\u0443\u0436\u0435\u043D \u0432\u0440\u0435\u0434\u043E\u043D\u043E\u0441\u043D\u044B\u0439 \u043F\u0440\u043E\u0446\u0435\u0441\u0441 pawns-cli! \u0412\u0430\u0448 ioBroker \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0442\u044C \u0441\u043A\u043E\u043C\u043F\u0440\u043E\u043C\u0435\u0442\u0438\u0440\u043E\u0432\u0430\u043D.",
+    pt: "[pwned-check] AVISO: processo malware pawns-cli detectado neste sistema! O seu ioBroker pode estar comprometido.",
+    nl: "[pwned-check] WAARSCHUWING: pawns-cli malware proces gedetecteerd op dit systeem! Uw ioBroker kan gecompromitteerd zijn.",
+    fr: "[pwned-check] AVERTISSEMENT : processus malware pawns-cli d\xE9tect\xE9 sur ce syst\xE8me ! Votre ioBroker pourrait \xEAtre compromis.",
+    it: "[pwned-check] ATTENZIONE: processo malware pawns-cli rilevato su questo sistema! Il vostro ioBroker potrebbe essere compromesso.",
+    es: "[pwned-check] ADVERTENCIA: proceso malware pawns-cli detectado en este sistema. Su ioBroker podr\xEDa estar comprometido.",
+    pl: "[pwned-check] OSTRZE\u017BENIE: wykryto proces malware pawns-cli w tym systemie! Tw\xF3j ioBroker mo\u017Ce by\u0107 zagro\u017Cony.",
+    uk: "[pwned-check] \u0423\u0412\u0410\u0413\u0410: \u0432\u0438\u044F\u0432\u043B\u0435\u043D\u043E \u043F\u0440\u043E\u0446\u0435\u0441 \u0448\u043A\u0456\u0434\u043B\u0438\u0432\u043E\u0433\u043E \u041F\u0417 pawns-cli! \u0412\u0430\u0448 ioBroker \u043C\u043E\u0436\u0435 \u0431\u0443\u0442\u0438 \u0441\u043A\u043E\u043C\u043F\u0440\u043E\u043C\u0435\u0442\u043E\u0432\u0430\u043D\u0438\u0439.",
+    "zh-cn": "[pwned-check] \u8B66\u544A\uFF1A\u5728\u6B64\u7CFB\u7EDF\u4E0A\u68C0\u6D4B\u5230 pawns-cli \u6076\u610F\u8F6F\u4EF6\u8FDB\u7A0B\uFF01\u60A8\u7684 ioBroker \u53EF\u80FD\u5DF2\u88AB\u5165\u4FB5\u3002"
   },
   emailCleared: {
     en: '[pwned-check] Security cleared: Email "%s" is no longer found in known breaches.',
@@ -214,6 +228,7 @@ class PwnedCheck extends utils.Adapter {
       await this.checkEmailEntry(entry);
       await sleep(1e3);
     }
+    await this.checkMalware();
     const anyPwned = [...this.prevState.values()].some((s) => s.isPwned);
     await this.setObjectNotExistsAsync("info.anyPwned", {
       type: "state",
@@ -467,6 +482,69 @@ class PwnedCheck extends utils.Adapter {
     } catch {
     }
   }
+  // ─── Malware check ───────────────────────────────────────────────────────
+  /**
+   * Checks whether the pawns-cli malware process is running on this system
+   */
+  isPawnsCliRunning() {
+    return new Promise((resolve) => {
+      (0, import_node_child_process.exec)("ps aux", (_err, stdout) => {
+        const lines = stdout.split("\n").filter((l) => !l.includes("grep"));
+        resolve(lines.some((l) => l.includes("pawns-cli")));
+      });
+    });
+  }
+  /**
+   * Runs the pawns-cli malware detection check and updates DPs + notifications
+   */
+  async checkMalware() {
+    const now = (/* @__PURE__ */ new Date()).toISOString();
+    try {
+      const detected = await this.isPawnsCliRunning();
+      await this.setObjectNotExistsAsync("system.pawns", {
+        type: "channel",
+        common: { name: "System Malware Check (pawns-cli)" },
+        native: {}
+      });
+      await this.setObjectNotExistsAsync("system.pawns.detected", {
+        type: "state",
+        common: {
+          name: "pawns-cli malware detected",
+          role: "indicator.alarm",
+          type: "boolean",
+          read: true,
+          write: false,
+          def: false
+        },
+        native: {}
+      });
+      await this.setObjectNotExistsAsync("system.pawns.lastCheck", {
+        type: "state",
+        common: {
+          name: "pawns-cli last check",
+          role: "date",
+          type: "string",
+          read: true,
+          write: false,
+          def: ""
+        },
+        native: {}
+      });
+      await this.setStateAsync("system.pawns.detected", { val: detected, ack: true });
+      await this.setStateAsync("system.pawns.lastCheck", { val: now, ack: true });
+      const prevKey = "system:pawns";
+      const prev = this.prevState.get(prevKey);
+      if (detected && !(prev == null ? void 0 : prev.isPwned)) {
+        this.log.warn("pawns-cli malware process detected on this system!");
+        await this.registerNotification("pwned-check", "breach", t("malwareDetected", this.lang));
+      } else if (!detected) {
+        this.log.debug("Malware check: pawns-cli not running.");
+      }
+      this.prevState.set(prevKey, { isPwned: detected });
+    } catch (err) {
+      this.log.error(`Error during malware check: ${String(err)}`);
+    }
+  }
   /**
    * Cleans up orphaned object trees for passwords/emails removed from config
    *
@@ -589,7 +667,8 @@ class PwnedCheck extends utils.Adapter {
       const lockSvg = isPwned ? `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
       const statusColor = isPwned ? "#e53935" : "#43a047";
       const statusText = isPwned ? `PWNED (${leakCount}\xD7)` : "SAFE";
-      pwCards.push(compactView ? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+      pwCards.push(
+        compactView ? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 					${lockSvg}
 					<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.description)}</div>
 				</div>` : `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
@@ -598,7 +677,8 @@ class PwnedCheck extends utils.Adapter {
 						<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.description)}</div>
 						<div style="font-size:0.85em;color:${statusColor};font-weight:500;">${statusText}</div>
 					</div>
-				</div>`);
+				</div>`
+      );
     }
     const emailCards = [];
     for (const entry of emails) {
@@ -625,7 +705,8 @@ class PwnedCheck extends utils.Adapter {
       const lockSvg = isPwned ? `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
       const statusColor = isPwned ? "#e53935" : "#43a047";
       const statusText = isPwned ? `PWNED (${breachNames.length}\xD7)` : "SAFE";
-      emailCards.push(compactView ? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+      emailCards.push(
+        compactView ? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 					${lockSvg}
 					<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.email)}</div>
 				</div>` : `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
@@ -634,14 +715,38 @@ class PwnedCheck extends utils.Adapter {
 						<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.email)}</div>
 						<div style="font-size:0.85em;color:${statusColor};font-weight:500;">${statusText}</div>
 					</div>
-				</div>`);
+				</div>`
+      );
     }
+    let malwareDetected = false;
+    try {
+      const malwareState = await this.getStateAsync("system.pawns.detected");
+      malwareDetected = (malwareState == null ? void 0 : malwareState.val) === true;
+    } catch {
+    }
+    const malwareSvg = malwareDetected ? `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
+    const malwareStatusColor = malwareDetected ? "#e53935" : "#43a047";
+    const malwareStatusText = malwareDetected ? "MALWARE DETECTED! pawns-cli is running." : "CLEAN";
+    const malwareCard = compactView ? `<div style="background:${safeCardBg};border:1px solid ${malwareDetected ? "#e53935" : borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+				${malwareSvg}
+				<div style="font-weight:600;color:${safeTextColor};">pawns-cli</div>
+			</div>` : `<div style="background:${safeCardBg};border:2px solid ${malwareDetected ? "#e53935" : borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
+				${malwareSvg}
+				<div>
+					<div style="font-weight:600;color:${safeTextColor};">pawns-cli Malware Check</div>
+					<div style="font-size:0.85em;color:${malwareStatusColor};font-weight:500;">${malwareStatusText}</div>
+				</div>
+			</div>`;
     const html = `
 <div style="font-family:sans-serif;font-size:${fontSize}px;background:${bgColor};padding:16px;border-radius:10px;color:${safeTextColor};">
 	<h3 style="margin:0 0 12px 0;color:${safeTextColor};">Pwned Check</h3>
 	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">Passwords</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
-	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">E-Mails</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">${emailCards.join("")}</div>` : ""}
-	${passwords.length === 0 && emails.length === 0 ? `<div style="color:#888;font-size:0.9em;">No entries configured.</div>` : ""}
+	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">E-Mails</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${emailCards.join("")}</div>` : ""}
+	<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">System</div>
+	<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">
+		${malwareCard}
+	</div>
+	${passwords.length === 0 && emails.length === 0 ? `<div style="color:#888;font-size:0.9em;margin-top:8px;">No password/email entries configured.</div>` : ""}
 	<div style="font-size:0.8em;color:#888;margin-top:10px;">Last check: ${lastUpdateStr}</div>
 </div>`;
     await this.setStateAsync("visualisation", { val: html, ack: true });

@@ -3,6 +3,8 @@
  * Leak & Password Check (Privacy First)
  */
 
+import { exec } from "node:child_process";
+
 import * as utils from "@iobroker/adapter-core";
 
 interface PasswordEntry {
@@ -82,6 +84,19 @@ const TRANSLATIONS: Record<string, Record<Lang, string>> = {
 		pl: '[pwned-check] E-mail "%s" znaleziony w %n wycieku(ach): %b',
 		uk: '[pwned-check] E-mail "%s" знайдено в %n витоку(ах): %b',
 		"zh-cn": '[pwned-check] 邮箱 "%s" 在 %n 次数据泄露中发现：%b',
+	},
+	malwareDetected: {
+		en: "[pwned-check] WARNING: pawns-cli malware process detected on this system! Your ioBroker may have been compromised.",
+		de: "[pwned-check] WARNUNG: pawns-cli Malware-Prozess auf diesem System entdeckt! Ihr ioBroker könnte kompromittiert sein.",
+		ru: "[pwned-check] ВНИМАНИЕ: обнаружен вредоносный процесс pawns-cli! Ваш ioBroker может быть скомпрометирован.",
+		pt: "[pwned-check] AVISO: processo malware pawns-cli detectado neste sistema! O seu ioBroker pode estar comprometido.",
+		nl: "[pwned-check] WAARSCHUWING: pawns-cli malware proces gedetecteerd op dit systeem! Uw ioBroker kan gecompromitteerd zijn.",
+		fr: "[pwned-check] AVERTISSEMENT : processus malware pawns-cli détecté sur ce système ! Votre ioBroker pourrait être compromis.",
+		it: "[pwned-check] ATTENZIONE: processo malware pawns-cli rilevato su questo sistema! Il vostro ioBroker potrebbe essere compromesso.",
+		es: "[pwned-check] ADVERTENCIA: proceso malware pawns-cli detectado en este sistema. Su ioBroker podría estar comprometido.",
+		pl: "[pwned-check] OSTRZEŻENIE: wykryto proces malware pawns-cli w tym systemie! Twój ioBroker może być zagrożony.",
+		uk: "[pwned-check] УВАГА: виявлено процес шкідливого ПЗ pawns-cli! Ваш ioBroker може бути скомпрометований.",
+		"zh-cn": "[pwned-check] 警告：在此系统上检测到 pawns-cli 恶意软件进程！您的 ioBroker 可能已被入侵。",
 	},
 	emailCleared: {
 		en: '[pwned-check] Security cleared: Email "%s" is no longer found in known breaches.',
@@ -262,7 +277,10 @@ class PwnedCheck extends utils.Adapter {
 			await sleep(1000);
 		}
 
-		// Update global anyPwned status
+		// Check for pawns-cli malware
+		await this.checkMalware();
+
+		// Update global anyPwned status (includes malware detection)
 		const anyPwned = [...this.prevState.values()].some(s => s.isPwned);
 		await this.setObjectNotExistsAsync("info.anyPwned", {
 			type: "state",
@@ -551,6 +569,77 @@ class PwnedCheck extends utils.Adapter {
 		}
 	}
 
+	// ─── Malware check ───────────────────────────────────────────────────────
+
+	/**
+	 * Checks whether the pawns-cli malware process is running on this system
+	 */
+	private isPawnsCliRunning(): Promise<boolean> {
+		return new Promise(resolve => {
+			exec("ps aux", (_err, stdout) => {
+				const lines = stdout.split("\n").filter(l => !l.includes("grep"));
+				resolve(lines.some(l => l.includes("pawns-cli")));
+			});
+		});
+	}
+
+	/**
+	 * Runs the pawns-cli malware detection check and updates DPs + notifications
+	 */
+	private async checkMalware(): Promise<void> {
+		const now = new Date().toISOString();
+		try {
+			const detected = await this.isPawnsCliRunning();
+
+			await this.setObjectNotExistsAsync("system.pawns", {
+				type: "channel",
+				common: { name: "System Malware Check (pawns-cli)" },
+				native: {},
+			});
+			await this.setObjectNotExistsAsync("system.pawns.detected", {
+				type: "state",
+				common: {
+					name: "pawns-cli malware detected",
+					role: "indicator.alarm",
+					type: "boolean",
+					read: true,
+					write: false,
+					def: false,
+				},
+				native: {},
+			});
+			await this.setObjectNotExistsAsync("system.pawns.lastCheck", {
+				type: "state",
+				common: {
+					name: "pawns-cli last check",
+					role: "date",
+					type: "string",
+					read: true,
+					write: false,
+					def: "",
+				},
+				native: {},
+			});
+
+			await this.setStateAsync("system.pawns.detected", { val: detected, ack: true });
+			await this.setStateAsync("system.pawns.lastCheck", { val: now, ack: true });
+
+			const prevKey = "system:pawns";
+			const prev = this.prevState.get(prevKey);
+
+			if (detected && !prev?.isPwned) {
+				this.log.warn("pawns-cli malware process detected on this system!");
+				await this.registerNotification("pwned-check", "breach", t("malwareDetected", this.lang));
+			} else if (!detected) {
+				this.log.debug("Malware check: pawns-cli not running.");
+			}
+
+			this.prevState.set(prevKey, { isPwned: detected });
+		} catch (err) {
+			this.log.error(`Error during malware check: ${String(err)}`);
+		}
+	}
+
 	/**
 	 * Cleans up orphaned object trees for passwords/emails removed from config
 	 *
@@ -762,12 +851,43 @@ class PwnedCheck extends utils.Adapter {
 			);
 		}
 
+		// Malware card
+		let malwareDetected = false;
+		try {
+			const malwareState = await this.getStateAsync("system.pawns.detected");
+			malwareDetected = malwareState?.val === true;
+		} catch {
+			// ignore
+		}
+
+		const malwareSvg = malwareDetected
+			? `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`
+			: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
+		const malwareStatusColor = malwareDetected ? "#e53935" : "#43a047";
+		const malwareStatusText = malwareDetected ? "MALWARE DETECTED! pawns-cli is running." : "CLEAN";
+		const malwareCard = compactView
+			? `<div style="background:${safeCardBg};border:1px solid ${malwareDetected ? "#e53935" : borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+				${malwareSvg}
+				<div style="font-weight:600;color:${safeTextColor};">pawns-cli</div>
+			</div>`
+			: `<div style="background:${safeCardBg};border:2px solid ${malwareDetected ? "#e53935" : borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
+				${malwareSvg}
+				<div>
+					<div style="font-weight:600;color:${safeTextColor};">pawns-cli Malware Check</div>
+					<div style="font-size:0.85em;color:${malwareStatusColor};font-weight:500;">${malwareStatusText}</div>
+				</div>
+			</div>`;
+
 		const html = `
 <div style="font-family:sans-serif;font-size:${fontSize}px;background:${bgColor};padding:16px;border-radius:10px;color:${safeTextColor};">
 	<h3 style="margin:0 0 12px 0;color:${safeTextColor};">Pwned Check</h3>
 	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">Passwords</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
-	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">E-Mails</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">${emailCards.join("")}</div>` : ""}
-	${passwords.length === 0 && emails.length === 0 ? `<div style="color:#888;font-size:0.9em;">No entries configured.</div>` : ""}
+	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">E-Mails</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${emailCards.join("")}</div>` : ""}
+	<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">System</div>
+	<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">
+		${malwareCard}
+	</div>
+	${passwords.length === 0 && emails.length === 0 ? `<div style="color:#888;font-size:0.9em;margin-top:8px;">No password/email entries configured.</div>` : ""}
 	<div style="font-size:0.8em;color:#888;margin-top:10px;">Last check: ${lastUpdateStr}</div>
 </div>`;
 
