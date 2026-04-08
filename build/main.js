@@ -22,6 +22,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var import_node_child_process = require("node:child_process");
+var import_promises = require("node:fs/promises");
 var utils = __toESM(require("@iobroker/adapter-core"));
 const TRANSLATIONS = {
   pwFound: {
@@ -484,16 +485,22 @@ class PwnedCheck extends utils.Adapter {
   }
   // ─── Malware check ───────────────────────────────────────────────────────
   /**
-   * Checks whether the pawns-cli malware process is running on this system.
-   * Returns the matched process line, or null if not found.
+   * Checks for pawns-cli malware: running process AND file in /tmp.
    */
-  isPawnsCliRunning() {
-    return new Promise((resolve) => {
+  async checkPawnsCli() {
+    const processLine = await new Promise((resolve) => {
       (0, import_node_child_process.exec)("ps aux", (_err, stdout) => {
         const match = stdout.split("\n").filter((l) => !l.includes("grep")).find((l) => l.includes("pawns-cli"));
         resolve(match != null ? match : null);
       });
     });
+    let fileFound = false;
+    try {
+      await (0, import_promises.access)("/tmp/pawns-cli");
+      fileFound = true;
+    } catch {
+    }
+    return { processLine, fileFound };
   }
   /**
    * Runs the pawns-cli malware detection check and updates DPs + notifications
@@ -501,18 +508,42 @@ class PwnedCheck extends utils.Adapter {
   async checkMalware() {
     const now = (/* @__PURE__ */ new Date()).toISOString();
     try {
-      const processLine = await this.isPawnsCliRunning();
-      const detected = processLine !== null;
+      const { processLine, fileFound } = await this.checkPawnsCli();
+      const detected = processLine !== null || fileFound;
       await this.setObjectNotExistsAsync("system.pawns", {
         type: "channel",
-        common: { name: "Malware: pawns-cli (Proxy-Monetarisierung)" },
+        common: { name: "Malware: pawns-cli (iProyal Proxy)" },
         native: {}
       });
       await this.setObjectNotExistsAsync("system.pawns.detected", {
         type: "state",
         common: {
-          name: "pawns-cli erkannt (Proxy-Malware verkauft Ihre Bandbreite)",
+          name: "pawns-cli erkannt (verkauft Bandbreite, legt Global-Scripts an)",
           role: "indicator.alarm",
+          type: "boolean",
+          read: true,
+          write: false,
+          def: false
+        },
+        native: {}
+      });
+      await this.setObjectNotExistsAsync("system.pawns.processRunning", {
+        type: "state",
+        common: {
+          name: "pawns-cli Prozess aktiv",
+          role: "indicator",
+          type: "boolean",
+          read: true,
+          write: false,
+          def: false
+        },
+        native: {}
+      });
+      await this.setObjectNotExistsAsync("system.pawns.fileFound", {
+        type: "state",
+        common: {
+          name: "pawns-cli Datei in /tmp gefunden",
+          role: "indicator",
           type: "boolean",
           read: true,
           write: false,
@@ -523,7 +554,7 @@ class PwnedCheck extends utils.Adapter {
       await this.setObjectNotExistsAsync("system.pawns.processInfo", {
         type: "state",
         common: {
-          name: "pawns-cli Prozessinformationen",
+          name: "pawns-cli Prozessdetails (ps aux)",
           role: "text",
           type: "string",
           read: true,
@@ -545,19 +576,26 @@ class PwnedCheck extends utils.Adapter {
         native: {}
       });
       await this.setStateAsync("system.pawns.detected", { val: detected, ack: true });
+      await this.setStateAsync("system.pawns.processRunning", { val: processLine !== null, ack: true });
+      await this.setStateAsync("system.pawns.fileFound", { val: fileFound, ack: true });
       await this.setStateAsync("system.pawns.processInfo", {
-        val: detected ? processLine.trim() : "",
+        val: processLine ? processLine.trim() : "",
         ack: true
       });
       await this.setStateAsync("system.pawns.lastCheck", { val: now, ack: true });
       const prevKey = "system:pawns";
       if (detected) {
-        this.log.warn(
-          `Malware pawns-cli detected! Process: ${processLine.trim()}. This software sells your internet bandwidth.`
-        );
+        const hints = [];
+        if (processLine) {
+          hints.push(`Prozess: ${processLine.trim()}`);
+        }
+        if (fileFound) {
+          hints.push("/tmp/pawns-cli vorhanden");
+        }
+        this.log.warn(`Malware pawns-cli detected! ${hints.join(" | ")}`);
         await this.registerNotification("pwned-check", "breach", t("malwareDetected", this.lang));
       } else {
-        this.log.debug("Malware check: pawns-cli not running.");
+        this.log.debug("Malware check: pawns-cli not found.");
       }
       this.prevState.set(prevKey, { isPwned: detected });
     } catch (err) {
@@ -745,8 +783,9 @@ class PwnedCheck extends utils.Adapter {
     }
     const malwareSvg = malwareDetected ? `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
     const malwareStatusColor = malwareDetected ? "#e53935" : "#43a047";
-    const malwareStatusText = malwareDetected ? "MALWARE AKTIV! pawns-cli verkauft Ihre Bandbreite." : "Kein Befall erkannt";
-    const malwareSubText = malwareDetected ? "Prozess sofort beenden & globale Skripte pr\xFCfen!" : "pawns-cli (Proxy-Monetarisierung)";
+    const malwareStatusText = malwareDetected ? "MALWARE AKTIV! pawns-cli (iProyal) verkauft Bandbreite & legt Scripts an." : "Kein Befall erkannt";
+    const malwareSubText = malwareDetected ? "Prozess beenden, /tmp/pawns-cli l\xF6schen, globale Scripts pr\xFCfen!" : "pawns-cli (iProyal Proxy-Monetarisierung)";
+    const forumLink = `<a href="https://forum.iobroker.net/topic/66381" target="_blank" style="color:#1976d2;font-size:0.75em;">Forum-Infos zum Angriff</a>`;
     const malwareCard = compactView ? `<div style="background:${safeCardBg};border:1px solid ${malwareDetected ? "#e53935" : borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 				${malwareSvg}
 				<div style="font-weight:600;color:${malwareStatusColor};">pawns-cli: ${malwareDetected ? "MALWARE AKTIV" : "OK"}</div>
@@ -756,6 +795,7 @@ class PwnedCheck extends utils.Adapter {
 					<div style="font-weight:600;color:${safeTextColor};">pawns-cli Malware-Check</div>
 					<div style="font-size:0.9em;color:${malwareStatusColor};font-weight:600;">${malwareStatusText}</div>
 					<div style="font-size:0.8em;color:${safeTextColor};opacity:0.7;">${malwareSubText}</div>
+					${malwareDetected ? `<div style="margin-top:4px;">${forumLink}</div>` : forumLink}
 				</div>
 			</div>`;
     const html = `

@@ -4,6 +4,7 @@
  */
 
 import { exec } from "node:child_process";
+import { access } from "node:fs/promises";
 
 import * as utils from "@iobroker/adapter-core";
 
@@ -573,11 +574,10 @@ class PwnedCheck extends utils.Adapter {
 	// ─── Malware check ───────────────────────────────────────────────────────
 
 	/**
-	 * Checks whether the pawns-cli malware process is running on this system.
-	 * Returns the matched process line, or null if not found.
+	 * Checks for pawns-cli malware: running process AND file in /tmp.
 	 */
-	private isPawnsCliRunning(): Promise<string | null> {
-		return new Promise(resolve => {
+	private async checkPawnsCli(): Promise<{ processLine: string | null; fileFound: boolean }> {
+		const processLine = await new Promise<string | null>(resolve => {
 			exec("ps aux", (_err, stdout) => {
 				const match = stdout
 					.split("\n")
@@ -586,6 +586,14 @@ class PwnedCheck extends utils.Adapter {
 				resolve(match ?? null);
 			});
 		});
+		let fileFound = false;
+		try {
+			await access("/tmp/pawns-cli");
+			fileFound = true;
+		} catch {
+			// file not present
+		}
+		return { processLine, fileFound };
 	}
 
 	/**
@@ -594,19 +602,43 @@ class PwnedCheck extends utils.Adapter {
 	private async checkMalware(): Promise<void> {
 		const now = new Date().toISOString();
 		try {
-			const processLine = await this.isPawnsCliRunning();
-			const detected = processLine !== null;
+			const { processLine, fileFound } = await this.checkPawnsCli();
+			const detected = processLine !== null || fileFound;
 
 			await this.setObjectNotExistsAsync("system.pawns", {
 				type: "channel",
-				common: { name: "Malware: pawns-cli (Proxy-Monetarisierung)" },
+				common: { name: "Malware: pawns-cli (iProyal Proxy)" },
 				native: {},
 			});
 			await this.setObjectNotExistsAsync("system.pawns.detected", {
 				type: "state",
 				common: {
-					name: "pawns-cli erkannt (Proxy-Malware verkauft Ihre Bandbreite)",
+					name: "pawns-cli erkannt (verkauft Bandbreite, legt Global-Scripts an)",
 					role: "indicator.alarm",
+					type: "boolean",
+					read: true,
+					write: false,
+					def: false,
+				},
+				native: {},
+			});
+			await this.setObjectNotExistsAsync("system.pawns.processRunning", {
+				type: "state",
+				common: {
+					name: "pawns-cli Prozess aktiv",
+					role: "indicator",
+					type: "boolean",
+					read: true,
+					write: false,
+					def: false,
+				},
+				native: {},
+			});
+			await this.setObjectNotExistsAsync("system.pawns.fileFound", {
+				type: "state",
+				common: {
+					name: "pawns-cli Datei in /tmp gefunden",
+					role: "indicator",
 					type: "boolean",
 					read: true,
 					write: false,
@@ -617,7 +649,7 @@ class PwnedCheck extends utils.Adapter {
 			await this.setObjectNotExistsAsync("system.pawns.processInfo", {
 				type: "state",
 				common: {
-					name: "pawns-cli Prozessinformationen",
+					name: "pawns-cli Prozessdetails (ps aux)",
 					role: "text",
 					type: "string",
 					read: true,
@@ -640,8 +672,10 @@ class PwnedCheck extends utils.Adapter {
 			});
 
 			await this.setStateAsync("system.pawns.detected", { val: detected, ack: true });
+			await this.setStateAsync("system.pawns.processRunning", { val: processLine !== null, ack: true });
+			await this.setStateAsync("system.pawns.fileFound", { val: fileFound, ack: true });
 			await this.setStateAsync("system.pawns.processInfo", {
-				val: detected ? processLine.trim() : "",
+				val: processLine ? processLine.trim() : "",
 				ack: true,
 			});
 			await this.setStateAsync("system.pawns.lastCheck", { val: now, ack: true });
@@ -649,12 +683,17 @@ class PwnedCheck extends utils.Adapter {
 			const prevKey = "system:pawns";
 
 			if (detected) {
-				this.log.warn(
-					`Malware pawns-cli detected! Process: ${processLine.trim()}. This software sells your internet bandwidth.`,
-				);
+				const hints: string[] = [];
+				if (processLine) {
+					hints.push(`Prozess: ${processLine.trim()}`);
+				}
+				if (fileFound) {
+					hints.push("/tmp/pawns-cli vorhanden");
+				}
+				this.log.warn(`Malware pawns-cli detected! ${hints.join(" | ")}`);
 				await this.registerNotification("pwned-check", "breach", t("malwareDetected", this.lang));
 			} else {
-				this.log.debug("Malware check: pawns-cli not running.");
+				this.log.debug("Malware check: pawns-cli not found.");
 			}
 
 			this.prevState.set(prevKey, { isPwned: detected });
@@ -888,11 +927,12 @@ class PwnedCheck extends utils.Adapter {
 			: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
 		const malwareStatusColor = malwareDetected ? "#e53935" : "#43a047";
 		const malwareStatusText = malwareDetected
-			? "MALWARE AKTIV! pawns-cli verkauft Ihre Bandbreite."
+			? "MALWARE AKTIV! pawns-cli (iProyal) verkauft Bandbreite & legt Scripts an."
 			: "Kein Befall erkannt";
 		const malwareSubText = malwareDetected
-			? "Prozess sofort beenden & globale Skripte prüfen!"
-			: "pawns-cli (Proxy-Monetarisierung)";
+			? "Prozess beenden, /tmp/pawns-cli löschen, globale Scripts prüfen!"
+			: "pawns-cli (iProyal Proxy-Monetarisierung)";
+		const forumLink = `<a href="https://forum.iobroker.net/topic/66381" target="_blank" style="color:#1976d2;font-size:0.75em;">Forum-Infos zum Angriff</a>`;
 		const malwareCard = compactView
 			? `<div style="background:${safeCardBg};border:1px solid ${malwareDetected ? "#e53935" : borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 				${malwareSvg}
@@ -904,6 +944,7 @@ class PwnedCheck extends utils.Adapter {
 					<div style="font-weight:600;color:${safeTextColor};">pawns-cli Malware-Check</div>
 					<div style="font-size:0.9em;color:${malwareStatusColor};font-weight:600;">${malwareStatusText}</div>
 					<div style="font-size:0.8em;color:${safeTextColor};opacity:0.7;">${malwareSubText}</div>
+					${malwareDetected ? `<div style="margin-top:4px;">${forumLink}</div>` : forumLink}
 				</div>
 			</div>`;
 
