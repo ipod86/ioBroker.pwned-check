@@ -86,17 +86,18 @@ const TRANSLATIONS: Record<string, Record<Lang, string>> = {
 		"zh-cn": '[pwned-check] 邮箱 "%s" 在 %n 次数据泄露中发现：%b',
 	},
 	malwareDetected: {
-		en: "[pwned-check] WARNING: pawns-cli malware process detected on this system! Your ioBroker may have been compromised.",
-		de: "[pwned-check] WARNUNG: pawns-cli Malware-Prozess auf diesem System entdeckt! Ihr ioBroker könnte kompromittiert sein.",
-		ru: "[pwned-check] ВНИМАНИЕ: обнаружен вредоносный процесс pawns-cli! Ваш ioBroker может быть скомпрометирован.",
-		pt: "[pwned-check] AVISO: processo malware pawns-cli detectado neste sistema! O seu ioBroker pode estar comprometido.",
-		nl: "[pwned-check] WAARSCHUWING: pawns-cli malware proces gedetecteerd op dit systeem! Uw ioBroker kan gecompromitteerd zijn.",
-		fr: "[pwned-check] AVERTISSEMENT : processus malware pawns-cli détecté sur ce système ! Votre ioBroker pourrait être compromis.",
-		it: "[pwned-check] ATTENZIONE: processo malware pawns-cli rilevato su questo sistema! Il vostro ioBroker potrebbe essere compromesso.",
-		es: "[pwned-check] ADVERTENCIA: proceso malware pawns-cli detectado en este sistema. Su ioBroker podría estar comprometido.",
-		pl: "[pwned-check] OSTRZEŻENIE: wykryto proces malware pawns-cli w tym systemie! Twój ioBroker może być zagrożony.",
-		uk: "[pwned-check] УВАГА: виявлено процес шкідливого ПЗ pawns-cli! Ваш ioBroker може бути скомпрометований.",
-		"zh-cn": "[pwned-check] 警告：在此系统上检测到 pawns-cli 恶意软件进程！您的 ioBroker 可能已被入侵。",
+		en: "[pwned-check] MALWARE DETECTED: pawns-cli is running on this system! This software secretly sells your internet bandwidth. Your ioBroker was likely infected via a malicious script. Kill the process and check your global scripts immediately!",
+		de: "[pwned-check] MALWARE ERKANNT: pawns-cli läuft auf diesem System! Diese Software verkauft heimlich Ihre Internetbandbreite. Ihr ioBroker wurde wahrscheinlich über ein bösartiges Skript infiziert. Prozess beenden und globale Skripte sofort prüfen!",
+		ru: "[pwned-check] ОБНАРУЖЕНА ВРЕДОНОСНАЯ ПРОГРАММА: pawns-cli запущен на этом устройстве! Эта программа тайно продаёт ваш интернет-трафик. Немедленно завершите процесс и проверьте глобальные скрипты!",
+		pt: "[pwned-check] MALWARE DETECTADO: pawns-cli está a correr neste sistema! Este software vende secretamente a sua largura de banda. Termine o processo e verifique os scripts globais imediatamente!",
+		nl: "[pwned-check] MALWARE GEDETECTEERD: pawns-cli draait op dit systeem! Deze software verkoopt uw internetbandbreedte. Beëindig het proces en controleer uw globale scripts onmiddellijk!",
+		fr: "[pwned-check] MALWARE DÉTECTÉ : pawns-cli tourne sur ce système ! Ce logiciel revend votre bande passante à votre insu. Arrêtez le processus et vérifiez vos scripts globaux immédiatement !",
+		it: "[pwned-check] MALWARE RILEVATO: pawns-cli è in esecuzione su questo sistema! Questo software vende segretamente la vostra larghezza di banda. Terminate il processo e controllate subito gli script globali!",
+		es: "[pwned-check] MALWARE DETECTADO: ¡pawns-cli está corriendo en este sistema! Este software vende secretamente su ancho de banda. ¡Detenga el proceso y revise sus scripts globales inmediatamente!",
+		pl: "[pwned-check] WYKRYTO MALWARE: pawns-cli działa na tym systemie! To oprogramowanie potajemnie sprzedaje Twój transfer internetowy. Zatrzymaj proces i natychmiast sprawdź globalne skrypty!",
+		uk: "[pwned-check] ВИЯВЛЕНО ШКІДЛИВЕ ПЗ: pawns-cli запущено на цьому пристрої! Ця програма таємно продає ваш інтернет-трафік. Негайно зупиніть процес і перевірте глобальні скрипти!",
+		"zh-cn":
+			"[pwned-check] 检测到恶意软件：pawns-cli 正在此系统上运行！该软件秘密出售您的网络带宽。请立即终止该进程并检查全局脚本！",
 	},
 	emailCleared: {
 		en: '[pwned-check] Security cleared: Email "%s" is no longer found in known breaches.',
@@ -572,13 +573,17 @@ class PwnedCheck extends utils.Adapter {
 	// ─── Malware check ───────────────────────────────────────────────────────
 
 	/**
-	 * Checks whether the pawns-cli malware process is running on this system
+	 * Checks whether the pawns-cli malware process is running on this system.
+	 * Returns the matched process line, or null if not found.
 	 */
-	private isPawnsCliRunning(): Promise<boolean> {
+	private isPawnsCliRunning(): Promise<string | null> {
 		return new Promise(resolve => {
 			exec("ps aux", (_err, stdout) => {
-				const lines = stdout.split("\n").filter(l => !l.includes("grep"));
-				resolve(lines.some(l => l.includes("pawns-cli")));
+				const match = stdout
+					.split("\n")
+					.filter(l => !l.includes("grep"))
+					.find(l => l.includes("pawns-cli"));
+				resolve(match ?? null);
 			});
 		});
 	}
@@ -589,17 +594,18 @@ class PwnedCheck extends utils.Adapter {
 	private async checkMalware(): Promise<void> {
 		const now = new Date().toISOString();
 		try {
-			const detected = await this.isPawnsCliRunning();
+			const processLine = await this.isPawnsCliRunning();
+			const detected = processLine !== null;
 
 			await this.setObjectNotExistsAsync("system.pawns", {
 				type: "channel",
-				common: { name: "System Malware Check (pawns-cli)" },
+				common: { name: "Malware: pawns-cli (Proxy-Monetarisierung)" },
 				native: {},
 			});
 			await this.setObjectNotExistsAsync("system.pawns.detected", {
 				type: "state",
 				common: {
-					name: "pawns-cli malware detected",
+					name: "pawns-cli erkannt (Proxy-Malware verkauft Ihre Bandbreite)",
 					role: "indicator.alarm",
 					type: "boolean",
 					read: true,
@@ -608,10 +614,22 @@ class PwnedCheck extends utils.Adapter {
 				},
 				native: {},
 			});
+			await this.setObjectNotExistsAsync("system.pawns.processInfo", {
+				type: "state",
+				common: {
+					name: "pawns-cli Prozessinformationen",
+					role: "text",
+					type: "string",
+					read: true,
+					write: false,
+					def: "",
+				},
+				native: {},
+			});
 			await this.setObjectNotExistsAsync("system.pawns.lastCheck", {
 				type: "state",
 				common: {
-					name: "pawns-cli last check",
+					name: "pawns-cli letzter Check",
 					role: "date",
 					type: "string",
 					read: true,
@@ -622,13 +640,18 @@ class PwnedCheck extends utils.Adapter {
 			});
 
 			await this.setStateAsync("system.pawns.detected", { val: detected, ack: true });
+			await this.setStateAsync("system.pawns.processInfo", {
+				val: detected ? processLine.trim() : "",
+				ack: true,
+			});
 			await this.setStateAsync("system.pawns.lastCheck", { val: now, ack: true });
 
 			const prevKey = "system:pawns";
 
 			if (detected) {
-				// Always notify — malware this severe warrants a notification on every check
-				this.log.warn("pawns-cli malware process detected on this system!");
+				this.log.warn(
+					`Malware pawns-cli detected! Process: ${processLine.trim()}. This software sells your internet bandwidth.`,
+				);
 				await this.registerNotification("pwned-check", "breach", t("malwareDetected", this.lang));
 			} else {
 				this.log.debug("Malware check: pawns-cli not running.");
@@ -864,17 +887,23 @@ class PwnedCheck extends utils.Adapter {
 			? `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`
 			: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
 		const malwareStatusColor = malwareDetected ? "#e53935" : "#43a047";
-		const malwareStatusText = malwareDetected ? "MALWARE DETECTED! pawns-cli is running." : "CLEAN";
+		const malwareStatusText = malwareDetected
+			? "MALWARE AKTIV! pawns-cli verkauft Ihre Bandbreite."
+			: "Kein Befall erkannt";
+		const malwareSubText = malwareDetected
+			? "Prozess sofort beenden & globale Skripte prüfen!"
+			: "pawns-cli (Proxy-Monetarisierung)";
 		const malwareCard = compactView
 			? `<div style="background:${safeCardBg};border:1px solid ${malwareDetected ? "#e53935" : borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 				${malwareSvg}
-				<div style="font-weight:600;color:${safeTextColor};">pawns-cli</div>
+				<div style="font-weight:600;color:${malwareStatusColor};">pawns-cli: ${malwareDetected ? "MALWARE AKTIV" : "OK"}</div>
 			</div>`
 			: `<div style="background:${safeCardBg};border:2px solid ${malwareDetected ? "#e53935" : borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
 				${malwareSvg}
 				<div>
-					<div style="font-weight:600;color:${safeTextColor};">pawns-cli Malware Check</div>
-					<div style="font-size:0.85em;color:${malwareStatusColor};font-weight:500;">${malwareStatusText}</div>
+					<div style="font-weight:600;color:${safeTextColor};">pawns-cli Malware-Check</div>
+					<div style="font-size:0.9em;color:${malwareStatusColor};font-weight:600;">${malwareStatusText}</div>
+					<div style="font-size:0.8em;color:${safeTextColor};opacity:0.7;">${malwareSubText}</div>
 				</div>
 			</div>`;
 
