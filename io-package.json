@@ -1,229 +1,230 @@
 {
-	"common": {
-		"name": "pwned-check",
-		"version": "0.0.3",
-		"news": {
-			"0.0.3": {
-				"en": "Fix dark theme in admin UI",
-				"de": "Dark-Theme in der Admin-Oberfläche korrigiert",
-				"ru": "Исправлена тёмная тема в интерфейсе администратора",
-				"pt": "Correção do tema escuro na interface de administração",
-				"nl": "Donker thema in admin-interface gecorrigeerd",
-				"fr": "Correction du thème sombre dans l'interface d'administration",
-				"it": "Tema scuro corretto nell'interfaccia di amministrazione",
-				"es": "Tema oscuro corregido en la interfaz de administración",
-				"pl": "Poprawka ciemnego motywu w interfejsie administratora",
-				"uk": "Виправлена темна тема в інтерфейсі адміністратора",
-				"zh-cn": "修复管理界面中的暗色主题"
-			},
-			"0.0.2": {
-				"en": "Add dark theme support for admin settings UI",
-				"de": "Dark-Theme-Unterstützung für die Admin-Einstellungen hinzugefügt",
-				"ru": "Добавлена поддержка тёмной темы для настроек администратора",
-				"pt": "Suporte ao tema escuro adicionado para a interface de configurações do admin",
-				"nl": "Ondersteuning voor donker thema toegevoegd aan admin-instellingen",
-				"fr": "Ajout du support du thème sombre pour les paramètres d'administration",
-				"it": "Aggiunto supporto al tema scuro per le impostazioni admin",
-				"es": "Soporte de tema oscuro añadido para la interfaz de configuración admin",
-				"pl": "Dodano obsługę ciemnego motywu dla ustawień administratora",
-				"uk": "Додано підтримку темної теми для налаштувань адміністратора",
-				"zh-cn": "为管理员设置界面添加暗色主题支持"
-			},
-			"0.0.1": {
-				"en": "Initial release",
-				"de": "Erstveröffentlichung",
-				"ru": "Первый выпуск",
-				"pt": "Versão inicial",
-				"nl": "Eerste versie",
-				"fr": "Version initiale",
-				"it": "Versione iniziale",
-				"es": "Versión inicial",
-				"pl": "Pierwsze wydanie",
-				"uk": "Перший випуск",
-				"zh-cn": "初始版本"
-			}
-		},
-		"titleLang": {
-			"en": "Pwned Check",
-			"de": "Pwned Check",
-			"ru": "Pwned Check",
-			"pt": "Pwned Check",
-			"nl": "Pwned Check",
-			"fr": "Pwned Check",
-			"it": "Pwned Check",
-			"es": "Pwned Check",
-			"pl": "Pwned Check",
-			"uk": "Pwned Check",
-			"zh-cn": "Pwned Check"
-		},
-		"desc": {
-			"en": "Leak & Password Check (Privacy First)",
-			"de": "Leak- & Passwort-Prüfung (Privacy First)",
-			"ru": "Проверка утечек и паролей (приватность прежде всего)",
-			"pt": "Verificação de Vazamentos e Senhas (Privacidade em Primeiro Lugar)",
-			"nl": "Lek- en wachtwoordcontrole (Privacy First)",
-			"fr": "Vérification des fuites et des mots de passe (Privacy First)",
-			"it": "Verifica fughe e password (Privacy First)",
-			"es": "Verificación de filtraciones y contraseñas (Privacy First)",
-			"pl": "Sprawdzanie wycieków i haseł (Privacy First)",
-			"uk": "Перевірка витоків і паролів (Privacy First)",
-			"zh-cn": "泄露和密码检查（隐私优先）"
-		},
-		"authors": [
-			"ipod86"
-		],
-		"keywords": [
-			"security",
-			"password",
-			"leak",
-			"check",
-			"privacy",
-			"password-check",
-			"hibp",
-			"pwned",
-			"credentials"
-		],
-		"licenseInformation": {
-			"type": "free",
-			"license": "MIT"
-		},
-		"platform": "Javascript/Node.js",
-		"icon": "pwned-check.svg",
-		"enabled": true,
-		"extIcon": "https://raw.githubusercontent.com/ipod86/ioBroker.pwned-check/main/admin/pwned-check.svg",
-		"readme": "https://github.com/ipod86/ioBroker.pwned-check/blob/main/README.md",
-		"loglevel": "info",
-		"tier": 3,
-		"mode": "daemon",
-		"type": "alarm",
-		"compact": true,
-		"connectionType": "cloud",
-		"dataSource": "poll",
-		"adminUI": {
-			"config": "materialize"
-		},
-		"dependencies": [
-			{
-				"js-controller": ">=6.0.11"
-			}
-		],
-		"globalDependencies": [
-			{
-				"admin": ">=7.6.20"
-			}
-		]
-	},
-	"native": {
-		"passwords": [],
-		"emails": [],
-		"checkInterval": 24,
-		"theme": "light",
-		"bgOpacity": 100,
-		"cardOpacity": 100,
-		"fontSize": 14,
-		"cardColor": "",
-		"compactView": false
-	},
-	"notifications": [
-		{
-			"scope": "pwned-check",
-			"name": {
-				"en": "Pwned Check",
-				"de": "Pwned Check",
-				"ru": "Pwned Check",
-				"pt": "Pwned Check",
-				"nl": "Pwned Check",
-				"fr": "Pwned Check",
-				"it": "Pwned Check",
-				"es": "Pwned Check",
-				"pl": "Pwned Check",
-				"uk": "Pwned Check",
-				"zh-cn": "Pwned Check"
-			},
-			"description": {
-				"en": "Security notifications from the pwned-check adapter",
-				"de": "Sicherheitsbenachrichtigungen vom pwned-check Adapter",
-				"ru": "Уведомления безопасности от адаптера pwned-check",
-				"pt": "Notificações de segurança do adaptador pwned-check",
-				"nl": "Beveiligingsmeldingen van de pwned-check adapter",
-				"fr": "Notifications de sécurité de l'adaptateur pwned-check",
-				"it": "Notifiche di sicurezza dall'adattatore pwned-check",
-				"es": "Notificaciones de seguridad del adaptador pwned-check",
-				"pl": "Powiadomienia bezpieczeństwa z adaptera pwned-check",
-				"uk": "Сповіщення безпеки від адаптера pwned-check",
-				"zh-cn": "来自 pwned-check 适配器的安全通知"
-			},
-			"categories": [
-				{
-					"category": "breach",
-					"name": {
-						"en": "Data breach detected",
-						"de": "Datenleck erkannt",
-						"ru": "Обнаружена утечка данных",
-						"pt": "Violação de dados detectada",
-						"nl": "Datalek gedetecteerd",
-						"fr": "Fuite de données détectée",
-						"it": "Violazione dei dati rilevata",
-						"es": "Filtración de datos detectada",
-						"pl": "Wykryto naruszenie danych",
-						"uk": "Виявлено витік даних",
-						"zh-cn": "检测到数据泄露"
-					},
-					"severity": "alert",
-					"description": {
-						"en": "A password or e-mail address was found in a data breach.",
-						"de": "Ein Passwort oder eine E-Mail-Adresse wurde in einem Datenleck gefunden.",
-						"ru": "Пароль или адрес электронной почты обнаружен в утечке данных.",
-						"pt": "Uma senha ou endereço de e-mail foi encontrado em uma violação de dados.",
-						"nl": "Een wachtwoord of e-mailadres werd gevonden in een datalek.",
-						"fr": "Un mot de passe ou une adresse e-mail a été trouvé dans une fuite de données.",
-						"it": "Una password o un indirizzo e-mail è stato trovato in una violazione dei dati.",
-						"es": "Se encontró una contraseña o dirección de correo electrónico en una filtración de datos.",
-						"pl": "Hasło lub adres e-mail zostało znalezione w naruszeniu danych.",
-						"uk": "Пароль або адреса електронної пошти виявлені у витоку даних.",
-						"zh-cn": "在数据泄露中发现了密码或电子邮件地址。"
-					},
-					"regex": [],
-					"limit": 10
-				}
-			]
-		}
-	],
-	"objects": [],
-	"instanceObjects": [
-		{
-			"_id": "info",
-			"type": "channel",
-			"common": {
-				"name": "Information"
-			},
-			"native": {}
-		},
-		{
-			"_id": "info.connection",
-			"type": "state",
-			"common": {
-				"role": "indicator.connected",
-				"name": "Device or service connected",
-				"type": "boolean",
-				"read": true,
-				"write": false,
-				"def": false
-			},
-			"native": {}
-		},
-		{
-			"_id": "visualisation",
-			"type": "state",
-			"common": {
-				"name": "Visualisation HTML",
-				"role": "html",
-				"type": "string",
-				"read": true,
-				"write": false,
-				"def": ""
-			},
-			"native": {}
-		}
-	]
+  "common": {
+    "name": "pwned-check",
+    "version": "0.0.3",
+    "news": {
+      "0.0.3": {
+        "en": "Fix dark theme in admin UI",
+        "de": "Dark-Theme in der Admin-Oberfläche korrigiert",
+        "ru": "Исправлена тёмная тема в интерфейсе администратора",
+        "pt": "Correção do tema escuro na interface de administração",
+        "nl": "Donker thema in admin-interface gecorrigeerd",
+        "fr": "Correction du thème sombre dans l'interface d'administration",
+        "it": "Tema scuro corretto nell'interfaccia di amministrazione",
+        "es": "Tema oscuro corregido en la interfaz de administración",
+        "pl": "Poprawka ciemnego motywu w interfejsie administratora",
+        "uk": "Виправлена темна тема в інтерфейсі адміністратора",
+        "zh-cn": "修复管理界面中的暗色主题"
+      },
+      "0.0.2": {
+        "en": "Add dark theme support for admin settings UI",
+        "de": "Dark-Theme-Unterstützung für die Admin-Einstellungen hinzugefügt",
+        "ru": "Добавлена поддержка тёмной темы для настроек администратора",
+        "pt": "Suporte ao tema escuro adicionado para a interface de configurações do admin",
+        "nl": "Ondersteuning voor donker thema toegevoegd aan admin-instellingen",
+        "fr": "Ajout du support du thème sombre pour les paramètres d'administration",
+        "it": "Aggiunto supporto al tema scuro per le impostazioni admin",
+        "es": "Soporte de tema oscuro añadido para la interfaz de configuración admin",
+        "pl": "Dodano obsługę ciemnego motywu dla ustawień administratora",
+        "uk": "Додано підтримку темної теми для налаштувань адміністратора",
+        "zh-cn": "为管理员设置界面添加暗色主题支持"
+      },
+      "0.0.1": {
+        "en": "Initial release",
+        "de": "Erstveröffentlichung",
+        "ru": "Первый выпуск",
+        "pt": "Versão inicial",
+        "nl": "Eerste versie",
+        "fr": "Version initiale",
+        "it": "Versione iniziale",
+        "es": "Versión inicial",
+        "pl": "Pierwsze wydanie",
+        "uk": "Перший випуск",
+        "zh-cn": "初始版本"
+      }
+    },
+    "titleLang": {
+      "en": "Pwned Check",
+      "de": "Pwned Check",
+      "ru": "Pwned Check",
+      "pt": "Pwned Check",
+      "nl": "Pwned Check",
+      "fr": "Pwned Check",
+      "it": "Pwned Check",
+      "es": "Pwned Check",
+      "pl": "Pwned Check",
+      "uk": "Pwned Check",
+      "zh-cn": "Pwned Check"
+    },
+    "desc": {
+      "en": "Leak & Password Check (Privacy First)",
+      "de": "Leak- & Passwort-Prüfung (Privacy First)",
+      "ru": "Проверка утечек и паролей (приватность прежде всего)",
+      "pt": "Verificação de Vazamentos e Senhas (Privacidade em Primeiro Lugar)",
+      "nl": "Lek- en wachtwoordcontrole (Privacy First)",
+      "fr": "Vérification des fuites et des mots de passe (Privacy First)",
+      "it": "Verifica fughe e password (Privacy First)",
+      "es": "Verificación de filtraciones y contraseñas (Privacy First)",
+      "pl": "Sprawdzanie wycieków i haseł (Privacy First)",
+      "uk": "Перевірка витоків і паролів (Privacy First)",
+      "zh-cn": "泄露和密码检查（隐私优先）"
+    },
+    "authors": [
+      "ipod86"
+    ],
+    "keywords": [
+      "security",
+      "password",
+      "leak",
+      "check",
+      "privacy",
+      "password-check",
+      "hibp",
+      "pwned",
+      "credentials"
+    ],
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "platform": "Javascript/Node.js",
+    "icon": "pwned-check.svg",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/ipod86/ioBroker.pwned-check/main/admin/pwned-check.svg",
+    "readme": "https://github.com/ipod86/ioBroker.pwned-check/blob/main/README.md",
+    "loglevel": "info",
+    "tier": 3,
+    "mode": "daemon",
+    "type": "alarm",
+    "compact": true,
+    "connectionType": "cloud",
+    "dataSource": "poll",
+    "adminUI": {
+      "config": "materialize"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.20"
+      }
+    ]
+  },
+  "native": {
+    "passwords": [],
+    "emails": [],
+    "checkInterval": 24,
+    "theme": "light",
+    "bgOpacity": 100,
+    "cardOpacity": 100,
+    "fontSize": 14,
+    "cardColor": "",
+    "compactView": false,
+    "malwareCheck": true
+  },
+  "notifications": [
+    {
+      "scope": "pwned-check",
+      "name": {
+        "en": "Pwned Check",
+        "de": "Pwned Check",
+        "ru": "Pwned Check",
+        "pt": "Pwned Check",
+        "nl": "Pwned Check",
+        "fr": "Pwned Check",
+        "it": "Pwned Check",
+        "es": "Pwned Check",
+        "pl": "Pwned Check",
+        "uk": "Pwned Check",
+        "zh-cn": "Pwned Check"
+      },
+      "description": {
+        "en": "Security notifications from the pwned-check adapter",
+        "de": "Sicherheitsbenachrichtigungen vom pwned-check Adapter",
+        "ru": "Уведомления безопасности от адаптера pwned-check",
+        "pt": "Notificações de segurança do adaptador pwned-check",
+        "nl": "Beveiligingsmeldingen van de pwned-check adapter",
+        "fr": "Notifications de sécurité de l'adaptateur pwned-check",
+        "it": "Notifiche di sicurezza dall'adattatore pwned-check",
+        "es": "Notificaciones de seguridad del adaptador pwned-check",
+        "pl": "Powiadomienia bezpieczeństwa z adaptera pwned-check",
+        "uk": "Сповіщення безпеки від адаптера pwned-check",
+        "zh-cn": "来自 pwned-check 适配器的安全通知"
+      },
+      "categories": [
+        {
+          "category": "breach",
+          "name": {
+            "en": "Data breach detected",
+            "de": "Datenleck erkannt",
+            "ru": "Обнаружена утечка данных",
+            "pt": "Violação de dados detectada",
+            "nl": "Datalek gedetecteerd",
+            "fr": "Fuite de données détectée",
+            "it": "Violazione dei dati rilevata",
+            "es": "Filtración de datos detectada",
+            "pl": "Wykryto naruszenie danych",
+            "uk": "Виявлено витік даних",
+            "zh-cn": "检测到数据泄露"
+          },
+          "severity": "alert",
+          "description": {
+            "en": "A password or e-mail address was found in a data breach.",
+            "de": "Ein Passwort oder eine E-Mail-Adresse wurde in einem Datenleck gefunden.",
+            "ru": "Пароль или адрес электронной почты обнаружен в утечке данных.",
+            "pt": "Uma senha ou endereço de e-mail foi encontrado em uma violação de dados.",
+            "nl": "Een wachtwoord of e-mailadres werd gevonden in een datalek.",
+            "fr": "Un mot de passe ou une adresse e-mail a été trouvé dans une fuite de données.",
+            "it": "Una password o un indirizzo e-mail è stato trovato in una violazione dei dati.",
+            "es": "Se encontró una contraseña o dirección de correo electrónico en una filtración de datos.",
+            "pl": "Hasło lub adres e-mail zostało znalezione w naruszeniu danych.",
+            "uk": "Пароль або адреса електронної пошти виявлені у витоку даних.",
+            "zh-cn": "在数据泄露中发现了密码或电子邮件地址。"
+          },
+          "regex": [],
+          "limit": 10
+        }
+      ]
+    }
+  ],
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "visualisation",
+      "type": "state",
+      "common": {
+        "name": "Visualisation HTML",
+        "role": "html",
+        "type": "string",
+        "read": true,
+        "write": false,
+        "def": ""
+      },
+      "native": {}
+    }
+  ]
 }

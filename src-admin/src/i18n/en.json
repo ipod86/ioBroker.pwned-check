@@ -37,5 +37,6 @@
     "strengthMedium": "Medium",
     "strengthGood": "Good",
     "cardColor": "Card color",
-    "compactView": "Compact view"
+    "compactView": "Compact view",
+    "malwareCheck": "pawns-cli malware check"
 }

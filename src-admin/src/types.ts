@@ -19,4 +19,5 @@ export interface PwnedCheckConfig {
     fontSize: number;
     cardColor: string;
     compactView: boolean;
+    malwareCheck: boolean;
 }

@@ -145,6 +145,16 @@ const SettingsPanel: React.FC<Props> = ({ native, onChange }) => {
                         }
                         label={I18n.t('compactView')}
                     />
+
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={native.malwareCheck !== false}
+                                onChange={e => update('malwareCheck', e.target.checked)}
+                            />
+                        }
+                        label={I18n.t('malwareCheck')}
+                    />
                 </Box>
             </Box>
 

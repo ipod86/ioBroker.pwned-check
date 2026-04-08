@@ -36,5 +36,6 @@
     "cardOpacity": "卡片透明度",
     "fontSize": "字体大小",
     "cardColor": "卡片颜色",
-    "compactView": "紧凑视图"
+    "compactView": "紧凑视图",
+    "malwareCheck": "pawns-cli 恶意软件检测"
 }

@@ -37,5 +37,6 @@
     "strengthMedium": "Mittel",
     "strengthGood": "Gut",
     "cardColor": "Kartenfarbe",
-    "compactView": "Kompakte Ansicht"
+    "compactView": "Kompakte Ansicht",
+    "malwareCheck": "pawns-cli Malware-Prüfung"
 }

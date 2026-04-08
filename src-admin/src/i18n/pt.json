@@ -36,5 +36,6 @@
     "cardOpacity": "Transparência do cartão",
     "fontSize": "Tamanho da fonte",
     "cardColor": "Cor do cartão",
-    "compactView": "Vista compacta"
+    "compactView": "Vista compacta",
+    "malwareCheck": "Verificação de malware pawns-cli"
 }

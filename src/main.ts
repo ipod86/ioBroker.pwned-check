@@ -29,6 +29,7 @@ interface AdapterConfig {
 	fontSize: number;
 	cardColor: string;
 	compactView: boolean;
+	malwareCheck: boolean;
 }
 
 type Lang = "en" | "de" | "ru" | "pt" | "nl" | "fr" | "it" | "es" | "pl" | "uk" | "zh-cn";
@@ -279,8 +280,10 @@ class PwnedCheck extends utils.Adapter {
 			await sleep(1000);
 		}
 
-		// Check for pawns-cli malware
-		await this.checkMalware();
+		// Check for pawns-cli malware (only if enabled in settings)
+		if (config.malwareCheck !== false) {
+			await this.checkMalware();
+		}
 
 		// Update global anyPwned status (includes malware detection)
 		const anyPwned = [...this.prevState.values()].some(s => s.isPwned);
@@ -913,51 +916,45 @@ class PwnedCheck extends utils.Adapter {
 			);
 		}
 
-		// Malware card
+		// Malware card (only shown if check is enabled AND malware was detected)
 		let malwareDetected = false;
-		try {
-			const malwareState = await this.getStateAsync("system.pawns.detected");
-			malwareDetected = malwareState?.val === true;
-		} catch {
-			// ignore
+		if (config.malwareCheck !== false) {
+			try {
+				const malwareState = await this.getStateAsync("system.pawns.detected");
+				malwareDetected = malwareState?.val === true;
+			} catch {
+				// ignore
+			}
 		}
 
-		const malwareSvg = malwareDetected
-			? `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`
-			: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
-		const malwareStatusColor = malwareDetected ? "#e53935" : "#43a047";
-		const malwareStatusText = malwareDetected
-			? "MALWARE AKTIV! pawns-cli (iProyal) verkauft Bandbreite & legt Scripts an."
-			: "Kein Befall erkannt";
-		const malwareSubText = malwareDetected
-			? "Prozess beenden, /tmp/pawns-cli löschen, globale Scripts prüfen!"
-			: "pawns-cli (iProyal Proxy-Monetarisierung)";
-		const forumLink = `<a href="https://forum.iobroker.net/topic/66381" target="_blank" style="color:#1976d2;font-size:0.75em;">Forum-Infos zum Angriff</a>`;
-		const malwareCard = compactView
-			? `<div style="background:${safeCardBg};border:1px solid ${malwareDetected ? "#e53935" : borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
-				${malwareSvg}
-				<div style="font-weight:600;color:${malwareStatusColor};">pawns-cli: ${malwareDetected ? "MALWARE AKTIV" : "OK"}</div>
-			</div>`
-			: `<div style="background:${safeCardBg};border:2px solid ${malwareDetected ? "#e53935" : borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
-				${malwareSvg}
-				<div>
-					<div style="font-weight:600;color:${safeTextColor};">pawns-cli Malware-Check</div>
-					<div style="font-size:0.9em;color:${malwareStatusColor};font-weight:600;">${malwareStatusText}</div>
-					<div style="font-size:0.8em;color:${safeTextColor};opacity:0.7;">${malwareSubText}</div>
-					${malwareDetected ? `<div style="margin-top:4px;">${forumLink}</div>` : forumLink}
-				</div>
-			</div>`;
+		const malwareSection = malwareDetected
+			? (() => {
+					const warnSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+					const card = compactView
+						? `<div style="background:${safeCardBg};border:2px solid #e53935;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+						${warnSvg}
+						<div style="font-weight:600;color:#e53935;">MALWARE: pawns-cli AKTIV</div>
+					</div>`
+						: `<div style="background:${safeCardBg};border:2px solid #e53935;border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
+						${warnSvg}
+						<div>
+							<div style="font-weight:600;color:${safeTextColor};">pawns-cli Malware erkannt!</div>
+							<div style="font-size:0.9em;color:#e53935;font-weight:600;">Verkauft Bandbreite &amp; legt Global-Scripts an.</div>
+							<div style="font-size:0.8em;color:${safeTextColor};opacity:0.7;">Prozess beenden, /tmp/pawns-cli löschen, globale Scripts prüfen!</div>
+							<div style="margin-top:4px;"><a href="https://forum.iobroker.net/topic/66381" target="_blank" style="color:#1976d2;font-size:0.75em;">Forum-Infos zum Angriff</a></div>
+						</div>
+					</div>`;
+					return `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#e53935;">⚠ System-Warnung</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${card}</div>`;
+				})()
+			: "";
 
 		const html = `
 <div style="font-family:sans-serif;font-size:${fontSize}px;background:${bgColor};padding:16px;border-radius:10px;color:${safeTextColor};">
 	<h3 style="margin:0 0 12px 0;color:${safeTextColor};">Pwned Check</h3>
+	${malwareSection}
 	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">Passwords</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
 	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">E-Mails</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${emailCards.join("")}</div>` : ""}
-	<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">System</div>
-	<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">
-		${malwareCard}
-	</div>
-	${passwords.length === 0 && emails.length === 0 ? `<div style="color:#888;font-size:0.9em;margin-top:8px;">No password/email entries configured.</div>` : ""}
+	${passwords.length === 0 && emails.length === 0 && !malwareDetected ? `<div style="color:#888;font-size:0.9em;">No entries configured.</div>` : ""}
 	<div style="font-size:0.8em;color:#888;margin-top:10px;">Last check: ${lastUpdateStr}</div>
 </div>`;
 

@@ -36,5 +36,6 @@
     "cardOpacity": "Transparence des cartes",
     "fontSize": "Taille de police",
     "cardColor": "Couleur de carte",
-    "compactView": "Vue compacte"
+    "compactView": "Vue compacte",
+    "malwareCheck": "Vérification malware pawns-cli"
 }

@@ -36,5 +36,6 @@
     "cardOpacity": "Прозрачность карточки",
     "fontSize": "Размер шрифта",
     "cardColor": "Цвет карточки",
-    "compactView": "Компактный вид"
+    "compactView": "Компактный вид",
+    "malwareCheck": "Проверка на вредоносное ПО pawns-cli"
 }

@@ -36,5 +36,6 @@
     "cardOpacity": "Kaarttransparantie",
     "fontSize": "Lettergrootte",
     "cardColor": "Kaartkleur",
-    "compactView": "Compacte weergave"
+    "compactView": "Compacte weergave",
+    "malwareCheck": "pawns-cli malwarecontrole"
 }
