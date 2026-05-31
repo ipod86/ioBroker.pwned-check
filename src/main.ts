@@ -751,7 +751,7 @@ class PwnedCheck extends utils.Adapter {
 					const channelName = parts[parts.length - 1];
 					if (!configPasswordIds.has(channelName)) {
 						this.log.info(`Removing orphaned password object tree: ${channelName}`);
-						await this.delObjectAsync(`passwords.${channelName}`, { recursive: true } as any);
+						await this.delObjectAsync(`passwords.${channelName}`, { recursive: true });
 					}
 				}
 			}
@@ -772,7 +772,7 @@ class PwnedCheck extends utils.Adapter {
 					const channelName = parts[parts.length - 1];
 					if (!configEmailIds.has(channelName) && channelName !== "leaks") {
 						this.log.info(`Removing orphaned email object tree: ${channelName}`);
-						await this.delObjectAsync(`emails.${channelName}`, { recursive: true } as any);
+						await this.delObjectAsync(`emails.${channelName}`, { recursive: true });
 					}
 				}
 			}
