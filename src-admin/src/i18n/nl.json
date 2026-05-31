@@ -37,5 +37,6 @@
     "fontSize": "Lettergrootte",
     "cardColor": "Kaartkleur",
     "compactView": "Compacte weergave",
-    "malwareCheck": "pawns-cli malwarecontrole"
+    "malwareCheck": "pawns-cli malwarecontrole",
+    "label": "Label"
 }

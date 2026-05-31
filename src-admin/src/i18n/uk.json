@@ -37,5 +37,6 @@
     "fontSize": "Розмір шрифту",
     "cardColor": "Колір картки",
     "compactView": "Компактний вигляд",
-    "malwareCheck": "Перевірка шкідливого ПЗ pawns-cli"
+    "malwareCheck": "Перевірка шкідливого ПЗ pawns-cli",
+    "label": "Мітка"
 }

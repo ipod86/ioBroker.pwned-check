@@ -135,46 +135,12 @@ function normalizeId(str: string): string {
 	return str.replace(/[^a-zA-Z0-9_]/g, "_").toLowerCase();
 }
 
-/**
- * Performs an HTTPS GET request and returns the response body
- *
- * @param url - The URL to GET
- * @param attempt - Current attempt number (for retry logic)
- * @returns Response body as string
- */
-async function httpsGet(url: string, attempt = 1): Promise<string> {
-	const controller = new AbortController();
-	const timer = setTimeout(() => controller.abort(), 15000);
-	try {
-		const res = await fetch(url, {
-			headers: { "User-Agent": "ioBroker-pwned-check/0.0.1" },
-			signal: controller.signal,
-		});
-		return await res.text();
-	} catch (err: any) {
-		if (err?.name === "AbortError") {
-			if (attempt < 2) {
-				await sleep(3000);
-				return httpsGet(url, attempt + 1);
-			}
-			throw new Error("Request timed out");
-		}
-		throw err;
-	} finally {
-		clearTimeout(timer);
-	}
-}
-
-function sleep(ms: number): Promise<void> {
-	return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 function isValidEmail(email: string): boolean {
 	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 class PwnedCheck extends utils.Adapter {
-	private checkTimer: ReturnType<typeof setTimeout> | null = null;
+	private checkTimer: ioBroker.Interval | undefined = undefined;
 	private prevState: Map<string, { isPwned: boolean; leakCount?: number }> = new Map();
 	private lang: Lang = "en";
 
@@ -186,6 +152,35 @@ class PwnedCheck extends utils.Adapter {
 		this.on("ready", this.onReady.bind(this));
 		this.on("message", this.onMessage.bind(this));
 		this.on("unload", this.onUnload.bind(this));
+	}
+
+	/**
+	 * Performs an HTTPS GET request with a 15s timeout and one automatic retry.
+	 *
+	 * @param url - The URL to GET
+	 * @param attempt - Current attempt number (for retry logic)
+	 */
+	private async httpsGet(url: string, attempt = 1): Promise<string> {
+		const controller = new AbortController();
+		const timer = this.setTimeout(() => controller.abort(), 15000);
+		try {
+			const res = await fetch(url, {
+				headers: { "User-Agent": "ioBroker-pwned-check/0.0.1" },
+				signal: controller.signal,
+			});
+			return await res.text();
+		} catch (err: any) {
+			if (err?.name === "AbortError") {
+				if (attempt < 2) {
+					await this.delay(3000);
+					return this.httpsGet(url, attempt + 1);
+				}
+				throw new Error("Request timed out");
+			}
+			throw err;
+		} finally {
+			this.clearTimeout(timer);
+		}
 	}
 
 	/**
@@ -218,7 +213,7 @@ class PwnedCheck extends utils.Adapter {
 		// Set up periodic interval
 		const intervalHours = config.checkInterval ?? 24;
 		const intervalMs = intervalHours * 60 * 60 * 1000;
-		this.checkTimer = setInterval(async () => {
+		this.checkTimer = this.setInterval(async () => {
 			await this.runAllChecks(this.config as unknown as AdapterConfig);
 		}, intervalMs);
 	}
@@ -245,8 +240,8 @@ class PwnedCheck extends utils.Adapter {
 	 */
 	private onUnload(callback: () => void): void {
 		if (this.checkTimer) {
-			clearInterval(this.checkTimer);
-			this.checkTimer = null;
+			this.clearInterval(this.checkTimer);
+			this.checkTimer = undefined;
 		}
 		callback();
 	}
@@ -268,7 +263,7 @@ class PwnedCheck extends utils.Adapter {
 				continue;
 			}
 			await this.checkPasswordEntry(entry);
-			await sleep(1000);
+			await this.delay(1000);
 		}
 
 		for (const entry of emails) {
@@ -277,7 +272,7 @@ class PwnedCheck extends utils.Adapter {
 				continue;
 			}
 			await this.checkEmailEntry(entry);
-			await sleep(1000);
+			await this.delay(1000);
 		}
 
 		// Check for pawns-cli malware (only if enabled in settings)
@@ -316,7 +311,7 @@ class PwnedCheck extends utils.Adapter {
 		const now = new Date().toISOString();
 
 		try {
-			const body = await httpsGet(`https://api.pwnedpasswords.com/range/${prefix}`);
+			const body = await this.httpsGet(`https://api.pwnedpasswords.com/range/${prefix}`);
 			const lines = body.split("\n");
 			let leakCount = 0;
 			let found = false;
@@ -426,7 +421,7 @@ class PwnedCheck extends utils.Adapter {
 		const now = new Date().toISOString();
 
 		try {
-			const body = await httpsGet(
+			const body = await this.httpsGet(
 				`https://api.xposedornot.com/v1/breach-analytics?email=${encodeURIComponent(entry.email)}`,
 			);
 			let parsed: {

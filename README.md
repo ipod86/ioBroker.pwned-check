@@ -109,6 +109,8 @@ The adapter creates data points under `pwned-check.<instance>`.
 ### 0.0.1 (2026-04-06)
 * (ipod86) initial release
 
+Older changelogs are available in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
+
 ## License
 
 MIT License

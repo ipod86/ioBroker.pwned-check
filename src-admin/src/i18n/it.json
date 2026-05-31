@@ -37,5 +37,6 @@
     "fontSize": "Dimensione testo",
     "cardColor": "Colore carta",
     "compactView": "Vista compatta",
-    "malwareCheck": "Controllo malware pawns-cli"
+    "malwareCheck": "Controllo malware pawns-cli",
+    "label": "Etichetta"
 }
