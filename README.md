@@ -94,8 +94,6 @@ The adapter creates data points under `pwned-check.<instance>`.
 ## Changelog
 
 ### **WORK IN PROGRESS**
-
-### 0.0.5 (2026-05-31)
 * (ipod86) fix: use this.setInterval/clearInterval/setTimeout/delay instead of plain JS timers (W5004, W5005, W5051)
 * (ipod86) fix: add missing i18n key "label" to all languages (W5604)
 * (ipod86) fix: engines.node >= 22, @tsconfig/node22, @types/node ^22, deploy node 24 (E0028, E3022)
