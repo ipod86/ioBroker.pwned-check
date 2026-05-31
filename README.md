@@ -93,6 +93,9 @@ The adapter creates data points under `pwned-check.<instance>`.
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22 now
+
 ### 0.0.4 (2026-04-08)
 * (ipod86) add pawns-cli malware detection (process + /tmp file check)
 * (ipod86) new DPs: system.pawns.detected, processRunning, fileFound, processInfo, lastCheck
