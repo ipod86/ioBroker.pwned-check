@@ -55,32 +55,6 @@
         "uk": "Виправлена темна тема в інтерфейсі адміністратора",
         "zh-cn": "修复管理界面中的暗色主题"
       },
-      "0.0.2": {
-        "en": "Add dark theme support for admin settings UI",
-        "de": "Dark-Theme-Unterstützung für die Admin-Einstellungen hinzugefügt",
-        "ru": "Добавлена поддержка тёмной темы для настроек администратора",
-        "pt": "Suporte ao tema escuro adicionado para a interface de configurações do admin",
-        "nl": "Ondersteuning voor donker thema toegevoegd aan admin-instellingen",
-        "fr": "Ajout du support du thème sombre pour les paramètres d'administration",
-        "it": "Aggiunto supporto al tema scuro per le impostazioni admin",
-        "es": "Soporte de tema oscuro añadido para la interfaz de configuración admin",
-        "pl": "Dodano obsługę ciemnego motywu dla ustawień administratora",
-        "uk": "Додано підтримку темної теми для налаштувань адміністратора",
-        "zh-cn": "为管理员设置界面添加暗色主题支持"
-      },
-      "0.0.1": {
-        "en": "Initial release",
-        "de": "Erstveröffentlichung",
-        "ru": "Первый выпуск",
-        "pt": "Versão inicial",
-        "nl": "Eerste versie",
-        "fr": "Version initiale",
-        "it": "Versione iniziale",
-        "es": "Versión inicial",
-        "pl": "Pierwsze wydanie",
-        "uk": "Перший випуск",
-        "zh-cn": "初始版本"
-      }
     },
     "titleLang": {
       "en": "Pwned Check",
