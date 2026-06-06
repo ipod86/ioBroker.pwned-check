@@ -126,7 +126,7 @@
     "connectionType": "cloud",
     "dataSource": "poll",
     "adminUI": {
-      "config": "custom"
+      "config": "materialize"
     },
     "dependencies": [
       {
