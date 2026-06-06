@@ -109,6 +109,14 @@ Der Adapter legt Datenpunkte unter `pwned-check.<instanz>` an.
 * (ipod86) fix: Fehlende Zwischenobjekte für emails, passwords, system, leaks hinzugefügt (E3009)
 * (ipod86) fix: @alcalzone/release-script auf >=5.2.1 aktualisiert (E0036)
 
+### 0.0.5 (2026-05-31)
+* (ipod86) fix: this.setInterval/clearInterval/setTimeout/delay statt einfacher JS-Timer (W5004, W5005, W5051)
+* (ipod86) fix: fehlenden i18n-Schlüssel „label" in allen Sprachen ergänzt (W5604)
+* (ipod86) fix: engines.node >= 22, @tsconfig/node22, @types/node ^22, Deploy Node 24 (E0028, E3022)
+* (ipod86) fix: Dependabot-Ignore-Block für @types/node Major-Versionen ergänzt (E8917)
+* (ipod86) fix: Node 20 aus Test-Matrix entfernt (W3024)
+* (ipod86) fix: TypeScript auf 6.0.3, release-script auf 5.2.0, @iobroker/eslint-config auf 2.3.4 aktualisiert
+
 ### 0.0.4 (2026-04-08)
 * (ipod86) pawns-cli-Malware-Erkennung (Prozess- + /tmp-Dateiprüfung)
 * (ipod86) neue Datenpunkte: system.pawns.detected, processRunning, fileFound, processInfo, lastCheck
@@ -119,11 +127,7 @@ Der Adapter legt Datenpunkte unter `pwned-check.<instanz>` an.
 ### 0.0.3 (2026-04-06)
 * (ipod86) Dunkles Theme in der Admin-UI korrigiert
 
-### 0.0.2 (2026-04-06)
-* (ipod86) Dunkles Theme für Admin-Einstellungs-UI hinzugefügt
-
-### 0.0.1 (2026-04-06)
-* (ipod86) Erstveröffentlichung
+Ältere Changelogs sind in [CHANGELOG_OLD.md](CHANGELOG_OLD.md) verfügbar.
 
 ## Lizenz
 
