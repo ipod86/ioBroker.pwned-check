@@ -257,6 +257,23 @@ class PwnedCheck extends utils.Adapter {
 		const passwords = config.passwords ?? [];
 		const emails = config.emails ?? [];
 
+		// Ensure top-level intermediate folder objects exist (E3009)
+		await this.setObjectNotExistsAsync("passwords", {
+			type: "folder",
+			common: { name: "Passwords" },
+			native: {},
+		});
+		await this.setObjectNotExistsAsync("emails", {
+			type: "folder",
+			common: { name: "E-Mails" },
+			native: {},
+		});
+		await this.setObjectNotExistsAsync("system", {
+			type: "folder",
+			common: { name: "System" },
+			native: {},
+		});
+
 		for (const entry of passwords) {
 			if (!entry.hash || entry.hash.length < 6) {
 				this.log.warn(`Password entry "${entry.description}" has no valid hash, skipping`);
@@ -487,6 +504,12 @@ class PwnedCheck extends utils.Adapter {
 			await this.setStateAsync(`emails.${safeId}.lastCheck`, { val: now, ack: true });
 
 			if (isPwned) {
+				// Ensure the leaks folder object exists (E3009 – missing intermediate parent)
+				await this.setObjectNotExistsAsync(`emails.${safeId}.leaks`, {
+					type: "folder",
+					common: { name: `${entry.email} — leaks` },
+					native: {},
+				});
 				// Create/update per-breach leak DPs — value is the breach year (or "unknown")
 				for (const [service, year] of breachMap) {
 					const safeService = normalizeId(service);

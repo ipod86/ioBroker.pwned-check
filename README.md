@@ -92,6 +92,10 @@ The adapter creates data points under `pwned-check.<instance>`.
 - E-mail addresses are sent to the XposedOrNot API over HTTPS
 
 ## Changelog
+### 0.0.6 (2026-06-06)
+* (ipod86) fix: add missing intermediate folder/channel objects for emails, passwords, system, leaks (E3009)
+* (ipod86) fix: update @alcalzone/release-script to >=5.2.1 (E0036)
+
 ### 0.0.5 (2026-05-31)
 * (ipod86) fix: use this.setInterval/clearInterval/setTimeout/delay instead of plain JS timers (W5004, W5005, W5051)
 * (ipod86) fix: add missing i18n key "label" to all languages (W5604)

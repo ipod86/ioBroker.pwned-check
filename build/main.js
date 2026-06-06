@@ -216,6 +216,21 @@ class PwnedCheck extends utils.Adapter {
     void this.setState("info.connection", { val: true, ack: true });
     const passwords = (_a = config.passwords) != null ? _a : [];
     const emails = (_b = config.emails) != null ? _b : [];
+    await this.setObjectNotExistsAsync("passwords", {
+      type: "folder",
+      common: { name: "Passwords" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("emails", {
+      type: "folder",
+      common: { name: "E-Mails" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("system", {
+      type: "folder",
+      common: { name: "System" },
+      native: {}
+    });
     for (const entry of passwords) {
       if (!entry.hash || entry.hash.length < 6) {
         this.log.warn(`Password entry "${entry.description}" has no valid hash, skipping`);
@@ -415,6 +430,11 @@ class PwnedCheck extends utils.Adapter {
       await this.setStateAsync(`emails.${safeId}.isPwned`, { val: isPwned, ack: true });
       await this.setStateAsync(`emails.${safeId}.lastCheck`, { val: now, ack: true });
       if (isPwned) {
+        await this.setObjectNotExistsAsync(`emails.${safeId}.leaks`, {
+          type: "folder",
+          common: { name: `${entry.email} \u2014 leaks` },
+          native: {}
+        });
         for (const [service, year] of breachMap) {
           const safeService = normalizeId(service);
           await this.extendObjectAsync(`emails.${safeId}.leaks.${safeService}`, {

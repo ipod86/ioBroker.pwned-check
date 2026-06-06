@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "pwned-check",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "news": {
+      "0.0.6": {
+        "en": "fix: add missing intermediate folder/channel objects for emails, passwords, system, leaks (E3009)\nfix: update @alcalzone/release-script to >=5.2.1 (E0036)",
+        "de": "fix: Fehlende Zwischenobjekte für emails, passwords, system, leaks hinzugefügt (E3009)\nfix: @alcalzone/release-script auf >=5.2.1 aktualisiert (E0036)",
+        "ru": "исправление: добавлены отсутствующие промежуточные объекты папок для emails, passwords, system, leaks (E3009)\nисправление: обновление @alcalzone/release-script до >=5.2.1 (E0036)",
+        "pt": "correção: adicionar objetos intermediários de pasta/canal em falta para emails, passwords, system, leaks (E3009)\ncorreção: atualizar @alcalzone/release-script para >=5.2.1 (E0036)",
+        "nl": "fix: ontbrekende tussenliggende map/kanaalobjecten toevoegen voor emails, passwords, system, leaks (E3009)\nfix: @alcalzone/release-script bijwerken naar >=5.2.1 (E0036)",
+        "fr": "correction: ajouter les objets de dossier/canal intermédiaires manquants pour emails, passwords, system, leaks (E3009)\ncorrection: mettre à jour @alcalzone/release-script vers >=5.2.1 (E0036)",
+        "it": "correzione: aggiungere oggetti cartella/canale intermedi mancanti per emails, passwords, system, leaks (E3009)\ncorrezione: aggiornare @alcalzone/release-script a >=5.2.1 (E0036)",
+        "es": "corrección: agregar objetos de carpeta/canal intermedios faltantes para emails, passwords, system, leaks (E3009)\ncorrección: actualizar @alcalzone/release-script a >=5.2.1 (E0036)",
+        "pl": "fix: dodaj brakujące pośrednie obiekty folderu/kanału dla emails, passwords, system, leaks (E3009)\nfix: zaktualizować @alcalzone/release-script do >=5.2.1 (E0036)",
+        "uk": "виправлення: додати відсутні проміжні об'єкти теки/каналу для emails, passwords, system, leaks (E3009)\nвиправлення: оновити @alcalzone/release-script до >=5.2.1 (E0036)",
+        "zh-cn": "修复：为emails、passwords、system、leaks添加缺少的中间文件夹/通道对象（E3009）\n修复：将@alcalzone/release-script更新至>=5.2.1（E0036）"
+      },
       "0.0.5": {
         "en": "fix: use this.setInterval/clearInterval/setTimeout/delay instead of plain JS timers (W5004, W5005, W5051)\nfix: add missing i18n key \"label\" to all languages (W5604)\nfix: engines.node >= 22, @tsconfig/node22, @types/node ^22, deploy node 24 (E0028, E3022)\nfix: add dependabot ignore block for @types/node major versions (E8917)\nfix: remove Node 20 from test matrix (W3024)\nfix: upgrade typescript to 6.0.3, release-script to 5.2.0, @iobroker/eslint-config to 2.3.4",
         "de": "fix: verwenden Sie this.setInterval/clearInterval/set Timeout/Delay statt einfacher JS-Timer (W5004, W5005, W5051)\nfix: Hinzufügen fehlender i18n-Schlüssel \"label\" in alle Sprachen (W5604)\nfix: engines.node >= 22, @tsconfig/node22, @types/node ^22, Deploy node 24 (E0028, E3022)\nfix: hinzufügen abhängigabot ignorieren Block für @types/node große Versionen (E8917)\nfix: Node 20 aus der Testmatrix entfernen (W3024)\nfix: upgrade-typscript auf 6.0.3, release-script auf 5.2.0, @iobroker/eslint-config auf 2.3.4",

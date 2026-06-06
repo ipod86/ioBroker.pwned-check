@@ -105,6 +105,10 @@ Der Adapter legt Datenpunkte unter `pwned-check.<instanz>` an.
 
 ## Changelog
 
+### 0.0.6 (2026-06-06)
+* (ipod86) fix: Fehlende Zwischenobjekte für emails, passwords, system, leaks hinzugefügt (E3009)
+* (ipod86) fix: @alcalzone/release-script auf >=5.2.1 aktualisiert (E0036)
+
 ### 0.0.4 (2026-04-08)
 * (ipod86) pawns-cli-Malware-Erkennung (Prozess- + /tmp-Dateiprüfung)
 * (ipod86) neue Datenpunkte: system.pawns.detected, processRunning, fileFound, processInfo, lastCheck
