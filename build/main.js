@@ -180,6 +180,84 @@ const TRANSLATIONS = {
     pl: "Informacje na forum o ataku",
     uk: "\u0406\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0456\u044F \u043F\u0440\u043E \u0430\u0442\u0430\u043A\u0443 \u043D\u0430 \u0444\u043E\u0440\u0443\u043C\u0456",
     "zh-cn": "\u8BBA\u575B\u4E2D\u5173\u4E8E\u6B64\u653B\u51FB\u7684\u4FE1\u606F"
+  },
+  statusSafe: {
+    en: "SAFE",
+    de: "SICHER",
+    ru: "\u0411\u0415\u0417\u041E\u041F\u0410\u0421\u041D\u041E",
+    pt: "SEGURO",
+    nl: "VEILIG",
+    fr: "S\xC9CURIS\xC9",
+    it: "SICURO",
+    es: "SEGURO",
+    pl: "BEZPIECZNE",
+    uk: "\u0411\u0415\u0417\u041F\u0415\u0427\u041D\u041E",
+    "zh-cn": "\u5B89\u5168"
+  },
+  statusPwned: {
+    en: "PWNED (%n\xD7)",
+    de: "KOMPROMITTIERT (%n\xD7)",
+    ru: "\u0421\u041A\u041E\u041C\u041F\u0420\u041E\u041C\u0415\u0422\u0418\u0420\u041E\u0412\u0410\u041D (%n\xD7)",
+    pt: "COMPROMETIDO (%n\xD7)",
+    nl: "GECOMPROMITTEERD (%n\xD7)",
+    fr: "COMPROMIS (%n\xD7)",
+    it: "COMPROMESSO (%n\xD7)",
+    es: "COMPROMETIDO (%n\xD7)",
+    pl: "SKOMPROMITOWANE (%n\xD7)",
+    uk: "\u0421\u041A\u041E\u041C\u041F\u0420\u041E\u041C\u0415\u0422\u041E\u0412\u0410\u041D\u041E (%n\xD7)",
+    "zh-cn": "\u5DF2\u6CC4\u9732 (%n\xD7)"
+  },
+  sectionPasswords: {
+    en: "Passwords",
+    de: "Passw\xF6rter",
+    ru: "\u041F\u0430\u0440\u043E\u043B\u0438",
+    pt: "Senhas",
+    nl: "Wachtwoorden",
+    fr: "Mots de passe",
+    it: "Password",
+    es: "Contrase\xF1as",
+    pl: "Has\u0142a",
+    uk: "\u041F\u0430\u0440\u043E\u043B\u0456",
+    "zh-cn": "\u5BC6\u7801"
+  },
+  sectionEmails: {
+    en: "E-Mails",
+    de: "E-Mails",
+    ru: "E-Mail \u0430\u0434\u0440\u0435\u0441\u0430",
+    pt: "E-Mails",
+    nl: "E-Mails",
+    fr: "E-Mails",
+    it: "E-Mail",
+    es: "Correos electr\xF3nicos",
+    pl: "E-Maile",
+    uk: "E-Mail \u0430\u0434\u0440\u0435\u0441\u0438",
+    "zh-cn": "\u90AE\u7BB1"
+  },
+  noEntries: {
+    en: "No entries configured.",
+    de: "Keine Eintr\xE4ge konfiguriert.",
+    ru: "\u0417\u0430\u043F\u0438\u0441\u0438 \u043D\u0435 \u043D\u0430\u0441\u0442\u0440\u043E\u0435\u043D\u044B.",
+    pt: "Nenhuma entrada configurada.",
+    nl: "Geen items geconfigureerd.",
+    fr: "Aucune entr\xE9e configur\xE9e.",
+    it: "Nessuna voce configurata.",
+    es: "No hay entradas configuradas.",
+    pl: "Brak skonfigurowanych wpis\xF3w.",
+    uk: "\u0417\u0430\u043F\u0438\u0441\u0438 \u043D\u0435 \u043D\u0430\u043B\u0430\u0448\u0442\u043E\u0432\u0430\u043D\u043E.",
+    "zh-cn": "\u672A\u914D\u7F6E\u4EFB\u4F55\u6761\u76EE\u3002"
+  },
+  lastCheck: {
+    en: "Last check:",
+    de: "Letzte Pr\xFCfung:",
+    ru: "\u041F\u043E\u0441\u043B\u0435\u0434\u043D\u044F\u044F \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0430:",
+    pt: "\xDAltima verifica\xE7\xE3o:",
+    nl: "Laatste controle:",
+    fr: "Derni\xE8re v\xE9rification :",
+    it: "Ultimo controllo:",
+    es: "\xDAltima comprobaci\xF3n:",
+    pl: "Ostatnie sprawdzenie:",
+    uk: "\u041E\u0441\u0442\u0430\u043D\u043D\u044F \u043F\u0435\u0440\u0435\u0432\u0456\u0440\u043A\u0430:",
+    "zh-cn": "\u6700\u540E\u68C0\u67E5\uFF1A"
   }
 };
 function t(key, lang, vars = {}) {
@@ -833,7 +911,7 @@ class PwnedCheck extends utils.Adapter {
       }
       const lockSvg = isPwned ? `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
       const statusColor = isPwned ? "#e53935" : "#43a047";
-      const statusText = isPwned ? `PWNED (${leakCount}\xD7)` : "SAFE";
+      const statusText = isPwned ? t("statusPwned", this.lang, { n: leakCount }) : t("statusSafe", this.lang);
       pwCards.push(
         compactView ? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 					${lockSvg}
@@ -871,7 +949,7 @@ class PwnedCheck extends utils.Adapter {
       }
       const lockSvg = isPwned ? `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
       const statusColor = isPwned ? "#e53935" : "#43a047";
-      const statusText = isPwned ? `PWNED (${breachNames.length}\xD7)` : "SAFE";
+      const statusText = isPwned ? t("statusPwned", this.lang, { n: breachNames.length }) : t("statusSafe", this.lang);
       emailCards.push(
         compactView ? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 					${lockSvg}
@@ -913,10 +991,10 @@ class PwnedCheck extends utils.Adapter {
 <div style="font-family:sans-serif;font-size:${fontSize}px;background:${bgColor};padding:16px;border-radius:10px;color:${safeTextColor};">
 	<h3 style="margin:0 0 12px 0;color:${safeTextColor};">Pwned Check</h3>
 	${malwareSection}
-	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">Passwords</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
-	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">E-Mails</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${emailCards.join("")}</div>` : ""}
-	${passwords.length === 0 && emails.length === 0 && !malwareDetected ? `<div style="color:#888;font-size:0.9em;">No entries configured.</div>` : ""}
-	<div style="font-size:0.8em;color:#888;margin-top:10px;">Last check: ${lastUpdateStr}</div>
+	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">${t("sectionPasswords", this.lang)}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
+	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">${t("sectionEmails", this.lang)}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${emailCards.join("")}</div>` : ""}
+	${passwords.length === 0 && emails.length === 0 && !malwareDetected ? `<div style="color:#888;font-size:0.9em;">${t("noEntries", this.lang)}</div>` : ""}
+	<div style="font-size:0.8em;color:#888;margin-top:10px;">${t("lastCheck", this.lang)} ${lastUpdateStr}</div>
 </div>`;
     await this.setStateAsync("visualisation", { val: html, ack: true });
   }

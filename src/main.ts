@@ -192,6 +192,84 @@ const TRANSLATIONS: Record<string, Record<Lang, string>> = {
 		uk: "Інформація про атаку на форумі",
 		"zh-cn": "论坛中关于此攻击的信息",
 	},
+	statusSafe: {
+		en: "SAFE",
+		de: "SICHER",
+		ru: "БЕЗОПАСНО",
+		pt: "SEGURO",
+		nl: "VEILIG",
+		fr: "SÉCURISÉ",
+		it: "SICURO",
+		es: "SEGURO",
+		pl: "BEZPIECZNE",
+		uk: "БЕЗПЕЧНО",
+		"zh-cn": "安全",
+	},
+	statusPwned: {
+		en: "PWNED (%n×)",
+		de: "KOMPROMITTIERT (%n×)",
+		ru: "СКОМПРОМЕТИРОВАН (%n×)",
+		pt: "COMPROMETIDO (%n×)",
+		nl: "GECOMPROMITTEERD (%n×)",
+		fr: "COMPROMIS (%n×)",
+		it: "COMPROMESSO (%n×)",
+		es: "COMPROMETIDO (%n×)",
+		pl: "SKOMPROMITOWANE (%n×)",
+		uk: "СКОМПРОМЕТОВАНО (%n×)",
+		"zh-cn": "已泄露 (%n×)",
+	},
+	sectionPasswords: {
+		en: "Passwords",
+		de: "Passwörter",
+		ru: "Пароли",
+		pt: "Senhas",
+		nl: "Wachtwoorden",
+		fr: "Mots de passe",
+		it: "Password",
+		es: "Contraseñas",
+		pl: "Hasła",
+		uk: "Паролі",
+		"zh-cn": "密码",
+	},
+	sectionEmails: {
+		en: "E-Mails",
+		de: "E-Mails",
+		ru: "E-Mail адреса",
+		pt: "E-Mails",
+		nl: "E-Mails",
+		fr: "E-Mails",
+		it: "E-Mail",
+		es: "Correos electrónicos",
+		pl: "E-Maile",
+		uk: "E-Mail адреси",
+		"zh-cn": "邮箱",
+	},
+	noEntries: {
+		en: "No entries configured.",
+		de: "Keine Einträge konfiguriert.",
+		ru: "Записи не настроены.",
+		pt: "Nenhuma entrada configurada.",
+		nl: "Geen items geconfigureerd.",
+		fr: "Aucune entrée configurée.",
+		it: "Nessuna voce configurata.",
+		es: "No hay entradas configuradas.",
+		pl: "Brak skonfigurowanych wpisów.",
+		uk: "Записи не налаштовано.",
+		"zh-cn": "未配置任何条目。",
+	},
+	lastCheck: {
+		en: "Last check:",
+		de: "Letzte Prüfung:",
+		ru: "Последняя проверка:",
+		pt: "Última verificação:",
+		nl: "Laatste controle:",
+		fr: "Dernière vérification :",
+		it: "Ultimo controllo:",
+		es: "Última comprobación:",
+		pl: "Ostatnie sprawdzenie:",
+		uk: "Остання перевірка:",
+		"zh-cn": "最后检查：",
+	},
 };
 
 function t(key: string, lang: Lang, vars: { s?: string; n?: number; p?: number; b?: string } = {}): string {
@@ -955,7 +1033,7 @@ class PwnedCheck extends utils.Adapter {
 				: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
 
 			const statusColor = isPwned ? "#e53935" : "#43a047";
-			const statusText = isPwned ? `PWNED (${leakCount}×)` : "SAFE";
+			const statusText = isPwned ? t("statusPwned", this.lang, { n: leakCount }) : t("statusSafe", this.lang);
 
 			pwCards.push(
 				compactView
@@ -1005,7 +1083,9 @@ class PwnedCheck extends utils.Adapter {
 				: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#43a047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
 
 			const statusColor = isPwned ? "#e53935" : "#43a047";
-			const statusText = isPwned ? `PWNED (${breachNames.length}×)` : "SAFE";
+			const statusText = isPwned
+				? t("statusPwned", this.lang, { n: breachNames.length })
+				: t("statusSafe", this.lang);
 
 			emailCards.push(
 				compactView
@@ -1059,10 +1139,10 @@ class PwnedCheck extends utils.Adapter {
 <div style="font-family:sans-serif;font-size:${fontSize}px;background:${bgColor};padding:16px;border-radius:10px;color:${safeTextColor};">
 	<h3 style="margin:0 0 12px 0;color:${safeTextColor};">Pwned Check</h3>
 	${malwareSection}
-	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">Passwords</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
-	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">E-Mails</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${emailCards.join("")}</div>` : ""}
-	${passwords.length === 0 && emails.length === 0 && !malwareDetected ? `<div style="color:#888;font-size:0.9em;">No entries configured.</div>` : ""}
-	<div style="font-size:0.8em;color:#888;margin-top:10px;">Last check: ${lastUpdateStr}</div>
+	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">${t("sectionPasswords", this.lang)}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
+	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">${t("sectionEmails", this.lang)}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${emailCards.join("")}</div>` : ""}
+	${passwords.length === 0 && emails.length === 0 && !malwareDetected ? `<div style="color:#888;font-size:0.9em;">${t("noEntries", this.lang)}</div>` : ""}
+	<div style="font-size:0.8em;color:#888;margin-top:10px;">${t("lastCheck", this.lang)} ${lastUpdateStr}</div>
 </div>`;
 
 		await this.setStateAsync("visualisation", { val: html, ack: true });
