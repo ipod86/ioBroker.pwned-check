@@ -238,21 +238,21 @@ class PwnedCheck extends utils.Adapter {
    * Adapter ready handler — runs full check and sets up interval
    */
   async onReady() {
-    var _a, _b;
+    var _a, _b, _c;
     void this.setState("info.connection", { val: false, ack: true });
     try {
       const sysConfig = await this.getForeignObjectAsync("system.config");
-      const syslang = (_a = sysConfig == null ? void 0 : sysConfig.common) == null ? void 0 : _a.language;
-      if (syslang && syslang in TRANSLATIONS.pwFound) {
-        this.lang = syslang;
-      }
+      const rawLang = ((_b = (_a = sysConfig == null ? void 0 : sysConfig.common) == null ? void 0 : _a.language) != null ? _b : "en").toLowerCase();
+      const supported = Object.keys(TRANSLATIONS.pwFound);
+      const resolved = supported.includes(rawLang) ? rawLang : supported.includes(rawLang.split("-")[0]) ? rawLang.split("-")[0] : "en";
+      this.lang = resolved;
     } catch {
     }
     const config = this.config;
     await this.loadPrevState(config);
     await this.cleanupOrphanedObjects(config);
     await this.runAllChecks(config);
-    const intervalHours = (_b = config.checkInterval) != null ? _b : 24;
+    const intervalHours = (_c = config.checkInterval) != null ? _c : 24;
     const intervalMs = intervalHours * 60 * 60 * 1e3;
     this.checkTimer = this.setInterval(async () => {
       await this.runAllChecks(this.config);

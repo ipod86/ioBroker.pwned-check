@@ -269,10 +269,14 @@ class PwnedCheck extends utils.Adapter {
 
 		try {
 			const sysConfig = await this.getForeignObjectAsync("system.config");
-			const syslang = (sysConfig?.common as any)?.language as string | undefined;
-			if (syslang && syslang in TRANSLATIONS.pwFound) {
-				this.lang = syslang as Lang;
-			}
+			const rawLang = (((sysConfig?.common as any)?.language as string | undefined) ?? "en").toLowerCase();
+			const supported = Object.keys(TRANSLATIONS.pwFound) as Lang[];
+			const resolved = supported.includes(rawLang as Lang)
+				? (rawLang as Lang)
+				: supported.includes(rawLang.split("-")[0] as Lang)
+					? (rawLang.split("-")[0] as Lang)
+					: "en";
+			this.lang = resolved;
 		} catch {
 			// use default "en"
 		}
