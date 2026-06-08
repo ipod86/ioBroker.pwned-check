@@ -111,6 +111,10 @@ Der Adapter legt Datenpunkte unter `pwned-check.<instanz>` an.
 
 ## Changelog
 
+### 0.0.8 (2026-06-09)
+* (ipod86) fix: robuste Spracherkennung für Widget (toLowerCase + Sprachfallback)
+* (ipod86) fix: alle Widget-Texte in Systemsprache übersetzt (SICHER/KOMPROMITTIERT/Abschnittsüberschriften/Letzte Prüfung)
+
 ### 0.0.7 (2026-06-08)
 * (ipod86) fix: alle Objektnamen und Widget-Texte auf Englisch/Systemsprache übersetzt
 * (ipod86) fix: Malware-Benachrichtigung wird jetzt nur bei neuer Erkennung gesendet

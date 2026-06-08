@@ -99,6 +99,10 @@ The adapter creates data points under `pwned-check.<instance>`.
 - E-mail addresses are sent to the XposedOrNot API over HTTPS
 
 ## Changelog
+### 0.0.8 (2026-06-09)
+* (ipod86) fix: robust language detection for widget (toLowerCase + language fallback)
+* (ipod86) fix: translate all widget strings to system language (SAFE/PWNED/section headers/last check)
+
 ### 0.0.7 (2026-06-08)
 * (ipod86) fix: translate all object names and widget texts to English/system language
 * (ipod86) fix: malware notification now only sent on new detection, not on every check

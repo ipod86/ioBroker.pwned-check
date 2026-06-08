@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "pwned-check",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "news": {
+      "0.0.8": {
+        "en": "fix: robust language detection for widget (toLowerCase + split fallback); translate all widget strings to system language",
+        "de": "fix: robuste Spracherkennung für Widget (toLowerCase + split-Fallback); alle Widget-Texte in Systemsprache übersetzt",
+        "ru": "fix: надёжное определение языка виджета (toLowerCase + split-запасной); перевод всех текстов виджета на язык системы",
+        "pt": "fix: detecção robusta de idioma para widget (toLowerCase + fallback split); traduzir todos os textos do widget para o idioma do sistema",
+        "nl": "fix: robuuste taaldetectie voor widget (toLowerCase + split-fallback); alle widgetteksten vertalen naar systeemtaal",
+        "fr": "fix: détection robuste de la langue du widget (toLowerCase + fallback split) ; traduire tous les textes du widget dans la langue du système",
+        "it": "fix: rilevamento robusto della lingua del widget (toLowerCase + fallback split); tradurre tutti i testi del widget nella lingua di sistema",
+        "es": "fix: detección robusta de idioma del widget (toLowerCase + split fallback); traducir todos los textos del widget al idioma del sistema",
+        "pl": "fix: solidne wykrywanie języka widgetu (toLowerCase + split fallback); przetłumacz wszystkie teksty widgetu na język systemu",
+        "uk": "fix: надійне визначення мови віджету (toLowerCase + split-запасний); переклад усіх текстів віджету на мову системи",
+        "zh-cn": "fix: 改进语言检测（toLowerCase + split 回退）；将所有小部件文本翻译为系统语言"
+      },
       "0.0.7": {
         "en": "fix: translate all object names and widget texts to English/system language; fix malware notification sent on every check (now only on new detection); skip malware check on non-Linux platforms; fix i18n description key in 9 languages",
         "de": "fix: alle Objektnamen und Widget-Texte auf Englisch/Systemsprache übersetzt; Malware-Benachrichtigung wird jetzt nur bei neuer Erkennung gesendet; Malware-Check auf Nicht-Linux-Systemen übersprungen; i18n description-Schlüssel in 9 Sprachen korrigiert",
