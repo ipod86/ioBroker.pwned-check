@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "pwned-check",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "news": {
+      "0.0.7": {
+        "en": "fix: translate all object names and widget texts to English/system language; fix malware notification sent on every check (now only on new detection); skip malware check on non-Linux platforms; fix i18n description key in 9 languages",
+        "de": "fix: alle Objektnamen und Widget-Texte auf Englisch/Systemsprache übersetzt; Malware-Benachrichtigung wird jetzt nur bei neuer Erkennung gesendet; Malware-Check auf Nicht-Linux-Systemen übersprungen; i18n description-Schlüssel in 9 Sprachen korrigiert",
+        "ru": "fix: перевести все имена объектов и тексты виджета на английский/язык системы; уведомление о вредоносном ПО теперь отправляется только при новом обнаружении; пропустить проверку на не-Linux платформах; исправить ключ description в 9 языковых файлах",
+        "pt": "fix: traduzir todos os nomes de objetos e textos do widget para inglês/idioma do sistema; notificação de malware agora enviada apenas em nova detecção; ignorar verificação em plataformas não-Linux; corrigir chave description em 9 idiomas",
+        "nl": "fix: alle objectnamen en widgetteksten vertalen naar Engels/systeemtaal; malwaremelding nu alleen bij nieuwe detectie; malwarecheck overgeslagen op niet-Linux platformen; description-sleutel gecorrigeerd in 9 talen",
+        "fr": "fix: traduire tous les noms d'objets et textes de widget en anglais/langue système; notification malware envoyée uniquement lors d'une nouvelle détection; ignorer la vérification sur les plateformes non-Linux; corriger la clé description dans 9 langues",
+        "it": "fix: tradurre tutti i nomi degli oggetti e i testi del widget in inglese/lingua di sistema; notifica malware inviata solo al nuovo rilevamento; saltare il controllo su piattaforme non-Linux; correggere la chiave description in 9 lingue",
+        "es": "fix: traducir todos los nombres de objetos y textos del widget al inglés/idioma del sistema; notificación de malware enviada solo en nueva detección; omitir verificación en plataformas no-Linux; corregir clave description en 9 idiomas",
+        "pl": "fix: przetłumaczyć wszystkie nazwy obiektów i teksty widgetu na angielski/język systemu; powiadomienie o malware wysyłane tylko przy nowym wykryciu; pominąć sprawdzanie na platformach innych niż Linux; poprawić klucz description w 9 językach",
+        "uk": "fix: перекласти всі назви об'єктів і тексти віджету на англійську/мову системи; сповіщення про шкідливе ПЗ тепер лише при новому виявленні; пропустити перевірку на не-Linux платформах; виправити ключ description у 9 мовах",
+        "zh-cn": "fix: 将所有对象名称和小部件文本翻译为英语/系统语言；恶意软件通知现在仅在新检测时发送；在非Linux平台跳过恶意软件检查；修正9种语言的description键"
+      },
       "0.0.6": {
         "en": "fix: add missing intermediate folder/channel objects for emails, passwords, system, leaks (E3009)\nfix: update @alcalzone/release-script to >=5.2.1 (E0036)",
         "de": "fix: Fehlende Zwischenobjekte für emails, passwords, system, leaks hinzugefügt (E3009)\nfix: @alcalzone/release-script auf >=5.2.1 aktualisiert (E0036)",

@@ -24,6 +24,13 @@ This adapter checks whether your passwords or e-mail addresses have appeared in 
 - **HTML visualisation** – generates a ready-to-use HTML data point for use in VIS or other dashboards
 - **Configurable appearance** – theme (light/dark), background transparency, card transparency, font size
 - **Configurable interval** – check every 3, 6, 12 or 24 hours
+- **Malware detection** – detects pawns-cli (iProyal proxy software) via process and file check (**Linux only** — automatically skipped on Windows and macOS)
+
+## Platform support
+
+Password and e-mail breach checking works on **all platforms** (Linux, Windows, macOS).
+
+The **malware detection** (pawns-cli check) is **Linux-only** — the malware itself is a Linux binary and does not exist on Windows or macOS. The check is automatically skipped on non-Linux systems; no configuration is required.
 
 ## Installation
 
@@ -92,6 +99,12 @@ The adapter creates data points under `pwned-check.<instance>`.
 - E-mail addresses are sent to the XposedOrNot API over HTTPS
 
 ## Changelog
+### 0.0.7 (2026-06-08)
+* (ipod86) fix: translate all object names and widget texts to English/system language
+* (ipod86) fix: malware notification now only sent on new detection, not on every check
+* (ipod86) fix: malware check skipped on non-Linux platforms (Windows/macOS)
+* (ipod86) fix: i18n description key corrected in 9 language files
+
 ### 0.0.6 (2026-06-06)
 * (ipod86) fix: add missing intermediate folder/channel objects for emails, passwords, system, leaks (E3009)
 * (ipod86) fix: update @alcalzone/release-script to >=5.2.1 (E0036)

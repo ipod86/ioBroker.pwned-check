@@ -24,7 +24,13 @@ Dieser Adapter prüft, ob Passwörter oder E-Mail-Adressen in bekannten Datenlec
 - **HTML-Visualisierung** – erzeugt einen fertigen HTML-Datenpunkt für VIS oder andere Dashboards
 - **Konfigurierbares Erscheinungsbild** – Theme (hell/dunkel), Hintergrundtransparenz, Kartentransparenz, Schriftgröße
 - **Konfigurierbares Intervall** – Prüfung alle 3, 6, 12 oder 24 Stunden
-- **Malware-Erkennung** – erkennt pawns-cli (iProyal-Proxy-Software), die unerlaubt Bandbreite verkauft und ioBroker-Skripte anlegt
+- **Malware-Erkennung** – erkennt pawns-cli (iProyal-Proxy-Software) via Prozess- und Dateiprüfung (**nur Linux** — wird auf Windows und macOS automatisch übersprungen)
+
+## Plattform-Unterstützung
+
+Die Passwort- und E-Mail-Prüfung funktioniert auf **allen Plattformen** (Linux, Windows, macOS).
+
+Die **Malware-Erkennung** (pawns-cli) ist **nur auf Linux verfügbar** — die Malware selbst ist ein Linux-Binary und existiert nicht auf Windows oder macOS. Die Prüfung wird auf Nicht-Linux-Systemen automatisch übersprungen.
 
 ## Installation
 
@@ -104,6 +110,12 @@ Der Adapter legt Datenpunkte unter `pwned-check.<instanz>` an.
 - E-Mail-Adressen werden über HTTPS an die XposedOrNot-API gesendet
 
 ## Changelog
+
+### 0.0.7 (2026-06-08)
+* (ipod86) fix: alle Objektnamen und Widget-Texte auf Englisch/Systemsprache übersetzt
+* (ipod86) fix: Malware-Benachrichtigung wird jetzt nur bei neuer Erkennung gesendet
+* (ipod86) fix: Malware-Check auf Windows/macOS automatisch übersprungen
+* (ipod86) fix: i18n description-Schlüssel in 9 Sprachdateien korrigiert
 
 ### 0.0.6 (2026-06-06)
 * (ipod86) fix: Fehlende Zwischenobjekte für emails, passwords, system, leaks hinzugefügt (E3009)

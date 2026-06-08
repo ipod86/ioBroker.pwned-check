@@ -114,6 +114,84 @@ const TRANSLATIONS: Record<string, Record<Lang, string>> = {
 		uk: '[pwned-check] Безпека відновлена: e-mail "%s" більше не знайдено у відомих витоках.',
 		"zh-cn": '[pwned-check] 安全已恢复：邮箱 "%s" 不再出现在已知泄露中。',
 	},
+	malwareWarning: {
+		en: "⚠ System Warning",
+		de: "⚠ System-Warnung",
+		ru: "⚠ Системное предупреждение",
+		pt: "⚠ Aviso do sistema",
+		nl: "⚠ Systeemwaarschuwing",
+		fr: "⚠ Avertissement système",
+		it: "⚠ Avviso di sistema",
+		es: "⚠ Advertencia del sistema",
+		pl: "⚠ Ostrzeżenie systemowe",
+		uk: "⚠ Системне попередження",
+		"zh-cn": "⚠ 系统警告",
+	},
+	malwareActive: {
+		en: "MALWARE: pawns-cli ACTIVE",
+		de: "MALWARE: pawns-cli AKTIV",
+		ru: "ВРЕДОНОС: pawns-cli АКТИВЕН",
+		pt: "MALWARE: pawns-cli ATIVO",
+		nl: "MALWARE: pawns-cli ACTIEF",
+		fr: "MALWARE : pawns-cli ACTIF",
+		it: "MALWARE: pawns-cli ATTIVO",
+		es: "MALWARE: pawns-cli ACTIVO",
+		pl: "MALWARE: pawns-cli AKTYWNY",
+		uk: "ШКІДЛИВЕ ПЗ: pawns-cli АКТИВНИЙ",
+		"zh-cn": "恶意软件：pawns-cli 活跃",
+	},
+	malwareTitle: {
+		en: "pawns-cli malware detected!",
+		de: "pawns-cli Malware erkannt!",
+		ru: "Обнаружена вредоносная программа pawns-cli!",
+		pt: "Malware pawns-cli detectado!",
+		nl: "pawns-cli malware gedetecteerd!",
+		fr: "Malware pawns-cli détecté !",
+		it: "Rilevato malware pawns-cli!",
+		es: "¡Detectado malware pawns-cli!",
+		pl: "Wykryto malware pawns-cli!",
+		uk: "Виявлено шкідливе ПЗ pawns-cli!",
+		"zh-cn": "检测到 pawns-cli 恶意软件！",
+	},
+	malwareSells: {
+		en: "Sells bandwidth &amp; creates global scripts.",
+		de: "Verkauft Bandbreite &amp; legt Global-Scripts an.",
+		ru: "Продаёт трафик и создаёт глобальные скрипты.",
+		pt: "Vende largura de banda e cria scripts globais.",
+		nl: "Verkoopt bandbreedte en maakt globale scripts aan.",
+		fr: "Revend la bande passante et crée des scripts globaux.",
+		it: "Vende larghezza di banda e crea script globali.",
+		es: "Vende ancho de banda y crea scripts globales.",
+		pl: "Sprzedaje przepustowość i tworzy globalne skrypty.",
+		uk: "Продає трафік і створює глобальні скрипти.",
+		"zh-cn": "出售带宽并创建全局脚本。",
+	},
+	malwareAction: {
+		en: "Kill process, delete /tmp/pawns-cli, check global scripts!",
+		de: "Prozess beenden, /tmp/pawns-cli löschen, globale Scripts prüfen!",
+		ru: "Завершите процесс, удалите /tmp/pawns-cli, проверьте глобальные скрипты!",
+		pt: "Termine o processo, apague /tmp/pawns-cli, verifique scripts globais!",
+		nl: "Beëindig het proces, verwijder /tmp/pawns-cli, controleer globale scripts!",
+		fr: "Arrêtez le processus, supprimez /tmp/pawns-cli, vérifiez les scripts globaux !",
+		it: "Termina il processo, elimina /tmp/pawns-cli, controlla gli script globali!",
+		es: "¡Detenga el proceso, borre /tmp/pawns-cli, revise los scripts globales!",
+		pl: "Zatrzymaj proces, usuń /tmp/pawns-cli, sprawdź globalne skrypty!",
+		uk: "Зупиніть процес, видаліть /tmp/pawns-cli, перевірте глобальні скрипти!",
+		"zh-cn": "终止进程，删除 /tmp/pawns-cli，检查全局脚本！",
+	},
+	malwareForum: {
+		en: "Forum info about the attack",
+		de: "Forum-Infos zum Angriff",
+		ru: "Информация об атаке на форуме",
+		pt: "Informações do fórum sobre o ataque",
+		nl: "Foruminformatie over de aanval",
+		fr: "Infos forum sur l'attaque",
+		it: "Info forum sull'attacco",
+		es: "Información del foro sobre el ataque",
+		pl: "Informacje na forum o ataku",
+		uk: "Інформація про атаку на форумі",
+		"zh-cn": "论坛中关于此攻击的信息",
+	},
 };
 
 function t(key: string, lang: Lang, vars: { s?: string; n?: number; p?: number; b?: string } = {}): string {
@@ -621,6 +699,10 @@ class PwnedCheck extends utils.Adapter {
 	 * Runs the pawns-cli malware detection check and updates DPs + notifications
 	 */
 	private async checkMalware(): Promise<void> {
+		if (process.platform === "win32") {
+			this.log.debug("Malware check: skipped on Windows (pawns-cli is Linux-only malware).");
+			return;
+		}
 		const now = new Date().toISOString();
 		try {
 			const { processLine, fileFound } = await this.checkPawnsCli();
@@ -634,7 +716,7 @@ class PwnedCheck extends utils.Adapter {
 			await this.setObjectNotExistsAsync("system.pawns.detected", {
 				type: "state",
 				common: {
-					name: "pawns-cli erkannt (verkauft Bandbreite, legt Global-Scripts an)",
+					name: "pawns-cli detected (sells bandwidth, creates global scripts)",
 					role: "indicator.alarm",
 					type: "boolean",
 					read: true,
@@ -646,7 +728,7 @@ class PwnedCheck extends utils.Adapter {
 			await this.setObjectNotExistsAsync("system.pawns.processRunning", {
 				type: "state",
 				common: {
-					name: "pawns-cli Prozess aktiv",
+					name: "pawns-cli process running",
 					role: "indicator",
 					type: "boolean",
 					read: true,
@@ -658,7 +740,7 @@ class PwnedCheck extends utils.Adapter {
 			await this.setObjectNotExistsAsync("system.pawns.fileFound", {
 				type: "state",
 				common: {
-					name: "pawns-cli Datei in /tmp gefunden",
+					name: "pawns-cli file found in /tmp",
 					role: "indicator",
 					type: "boolean",
 					read: true,
@@ -670,7 +752,7 @@ class PwnedCheck extends utils.Adapter {
 			await this.setObjectNotExistsAsync("system.pawns.processInfo", {
 				type: "state",
 				common: {
-					name: "pawns-cli Prozessdetails (ps aux)",
+					name: "pawns-cli process details (ps aux)",
 					role: "text",
 					type: "string",
 					read: true,
@@ -682,7 +764,7 @@ class PwnedCheck extends utils.Adapter {
 			await this.setObjectNotExistsAsync("system.pawns.lastCheck", {
 				type: "state",
 				common: {
-					name: "pawns-cli letzter Check",
+					name: "pawns-cli last check",
 					role: "date",
 					type: "string",
 					read: true,
@@ -702,17 +784,20 @@ class PwnedCheck extends utils.Adapter {
 			await this.setStateAsync("system.pawns.lastCheck", { val: now, ack: true });
 
 			const prevKey = "system:pawns";
+			const prev = this.prevState.get(prevKey);
 
 			if (detected) {
 				const hints: string[] = [];
 				if (processLine) {
-					hints.push(`Prozess: ${processLine.trim()}`);
+					hints.push(`Process: ${processLine.trim()}`);
 				}
 				if (fileFound) {
-					hints.push("/tmp/pawns-cli vorhanden");
+					hints.push("/tmp/pawns-cli present");
 				}
 				this.log.warn(`Malware pawns-cli detected! ${hints.join(" | ")}`);
-				await this.registerNotification("pwned-check", "breach", t("malwareDetected", this.lang));
+				if (!prev || !prev.isPwned) {
+					await this.registerNotification("pwned-check", "breach", t("malwareDetected", this.lang));
+				}
 			} else {
 				this.log.debug("Malware check: pawns-cli not found.");
 			}
@@ -951,18 +1036,18 @@ class PwnedCheck extends utils.Adapter {
 					const card = compactView
 						? `<div style="background:${safeCardBg};border:2px solid #e53935;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 						${warnSvg}
-						<div style="font-weight:600;color:#e53935;">MALWARE: pawns-cli AKTIV</div>
+						<div style="font-weight:600;color:#e53935;">${t("malwareActive", this.lang)}</div>
 					</div>`
 						: `<div style="background:${safeCardBg};border:2px solid #e53935;border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
 						${warnSvg}
 						<div>
-							<div style="font-weight:600;color:${safeTextColor};">pawns-cli Malware erkannt!</div>
-							<div style="font-size:0.9em;color:#e53935;font-weight:600;">Verkauft Bandbreite &amp; legt Global-Scripts an.</div>
-							<div style="font-size:0.8em;color:${safeTextColor};opacity:0.7;">Prozess beenden, /tmp/pawns-cli löschen, globale Scripts prüfen!</div>
-							<div style="margin-top:4px;"><a href="https://forum.iobroker.net/topic/66381" target="_blank" style="color:#1976d2;font-size:0.75em;">Forum-Infos zum Angriff</a></div>
+							<div style="font-weight:600;color:${safeTextColor};">${t("malwareTitle", this.lang)}</div>
+							<div style="font-size:0.9em;color:#e53935;font-weight:600;">${t("malwareSells", this.lang)}</div>
+							<div style="font-size:0.8em;color:${safeTextColor};opacity:0.7;">${t("malwareAction", this.lang)}</div>
+							<div style="margin-top:4px;"><a href="https://forum.iobroker.net/topic/66381" target="_blank" style="color:#1976d2;font-size:0.75em;">${t("malwareForum", this.lang)}</a></div>
 						</div>
 					</div>`;
-					return `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#e53935;">⚠ System-Warnung</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${card}</div>`;
+					return `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#e53935;">${t("malwareWarning", this.lang)}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${card}</div>`;
 				})()
 			: "";
 
