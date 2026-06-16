@@ -99,6 +99,10 @@ The adapter creates data points under `pwned-check.<instance>`.
 - E-mail addresses are sent to the XposedOrNot API over HTTPS
 
 ## Changelog
+
+### **WORK IN PROGRESS**
+- (ioBroker-Bot) Adapter requires admin >= 7.8.23 now.
+
 ### 0.0.8 (2026-06-09)
 * (ipod86) fix: robust language detection for widget (toLowerCase + language fallback)
 * (ipod86) fix: translate all widget strings to system language (SAFE/PWNED/section headers/last check)
