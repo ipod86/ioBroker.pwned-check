@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "pwned-check",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "news": {
+      "0.0.9": {
+        "en": "fix: update adapter-core to 3.4.1, clarify malware scanner description in README (W0034)\nfix: update admin dependency to >= 7.8.23 and fix dependabot cooldown format (W8917)",
+        "de": "Behoben: Adapter-Core auf Version 3.4.1 aktualisiert, Beschreibung des Malware-Scanners in der README-Datei präzisiert (W0034)\nBehoben: Aktualisierung der Admin-Abhängigkeit auf >= 7.8.23 und Korrektur des Dependabot-Cooldown-Formats (W8917)",
+        "ru": "Исправление: обновление adapter-core до версии 3.4.1, уточнение описания сканера вредоносных программ в файле README (W0034)\nИсправление: обновление зависимости администратора до версии >= 7.8.23 и исправление формата задержки загрузки dependabot (W8917)",
+        "pt": "Correção: atualizar adapter-core para 3.4.1, esclarecer a descrição do scanner de malware no arquivo README (W0034)\nCorreção: atualizar dependência de administração para >= 7.8.23 e corrigir formato de cooldown do Dependabot (W8917)",
+        "nl": "Oplossing: adapter-core bijgewerkt naar 3.4.1, beschrijving van de malwarescanner in README verduidelijkt (W0034)\nOplossing: update de beheerdersafhankelijkheid naar >= 7.8.23 en corrigeer het formaat van de Dependabot-cooldown (W8917).",
+        "fr": "Correctif : mise à jour du noyau de l’adaptateur vers la version 3.4.1, clarification de la description du scanner de logiciels malveillants dans le fichier README (W0034)\nCorrection : mise à jour de la dépendance d’administration vers la version 7.8.23 ou supérieure et correction du format de délai d’attente de Dependabot (W8917)",
+        "it": "Correzione: aggiornato adapter-core alla versione 3.4.1, chiarita la descrizione dello scanner antimalware nel file README (W0034)\nCorrezione: aggiornare la dipendenza di amministrazione a >= 7.8.23 e correggere il formato del cooldown di Dependabot (W8917)",
+        "es": "Corrección: actualizar adapter-core a la versión 3.4.1, aclarar la descripción del escáner de malware en el archivo README (W0034).\nCorrección: actualizar la dependencia de administrador a >= 7.8.23 y corregir el formato de enfriamiento de Dependabot (W8917)",
+        "pl": "naprawiono: aktualizacja adapter-core do wersji 3.4.1, doprecyzowanie opisu skanera malware w pliku README (W0034)\nnaprawiono: aktualizacja zależności administratora do wersji >= 7.8.23 i naprawa formatu cooldownu dependabot (W8917)",
+        "uk": "виправлення: оновлення adapter-core до версії 3.4.1, уточнення опису сканера шкідливих програм у README (W0034)\nвиправлення: оновіть залежність адміністратора до >= 7.8.23 та виправте формат відновлення залежного робота (W8917)",
+        "zh-cn": "修复：将 adapter-core 更新至 3.4.1 版本，并在 README 文件中明确恶意软件扫描器的描述 (W0034)\n修复：将管理员依赖项更新至 >= 7.8.23 并修复 Dependabot 冷却时间格式 (W8917)"
+      },
       "0.0.8": {
         "en": "fix: robust language detection for widget (toLowerCase + split fallback); translate all widget strings to system language",
         "de": "fix: robuste Spracherkennung für Widget (toLowerCase + split-Fallback); alle Widget-Texte in Systemsprache übersetzt",

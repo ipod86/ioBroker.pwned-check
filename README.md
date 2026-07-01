@@ -99,6 +99,14 @@ The adapter creates data points under `pwned-check.<instance>`.
 - E-mail addresses are sent to the XposedOrNot API over HTTPS
 
 ## Changelog
+<!--
+	Placeholder for the next version (at the beginning of the line):
+	### **WORK IN PROGRESS**
+-->
+### 0.0.9 (2026-07-01)
+* (ipod86) fix: update adapter-core to 3.4.1, clarify malware scanner description in README (W0034)
+* (ipod86) fix: update admin dependency to >= 7.8.23 and fix dependabot cooldown format (W8917)
+
 ### 0.0.8 (2026-06-09)
 * (ipod86) fix: robust language detection for widget (toLowerCase + language fallback)
 * (ipod86) fix: translate all widget strings to system language (SAFE/PWNED/section headers/last check)
@@ -120,16 +128,6 @@ The adapter creates data points under `pwned-check.<instance>`.
 * (ipod86) fix: add dependabot ignore block for @types/node major versions (E8917)
 * (ipod86) fix: remove Node 20 from test matrix (W3024)
 * (ipod86) fix: upgrade typescript to 6.0.3, release-script to 5.2.0, @iobroker/eslint-config to 2.3.4
-
-### 0.0.4 (2026-04-08)
-* (ipod86) add pawns-cli malware detection (process + /tmp file check)
-* (ipod86) new DPs: system.pawns.detected, processRunning, fileFound, processInfo, lastCheck
-* (ipod86) widget shows malware warning only when detected, with forum link
-* (ipod86) notification on every check if malware active
-* (ipod86) setting to enable/disable malware check (default: on)
-
-### 0.0.3 (2026-04-06)
-* (ipod86) fix dark theme in admin UI
 
 Older changelogs are available in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 
