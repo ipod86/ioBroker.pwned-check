@@ -30,7 +30,7 @@ This adapter checks whether your passwords or e-mail addresses have appeared in 
 
 Password and e-mail breach checking works on **all platforms** (Linux, Windows, macOS).
 
-The **malware detection** (pawns-cli check) is **Linux-only** — the malware itself is a Linux binary and does not exist on Windows or macOS. The check is automatically skipped on non-Linux systems; no configuration is required.
+The **malware detection** (pawns-cli check) is **Linux-only** — the malware detection tool (pawns-cli) is a Linux binary and is not available on Windows or macOS. The check is automatically skipped on non-Linux systems; no configuration is required.
 
 ## Installation
 
