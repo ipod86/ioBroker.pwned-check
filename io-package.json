@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "pwned-check",
-    "version": "0.0.9",
+    "version": "0.0.10",
     "news": {
+      "0.0.10": {
+        "en": "fix: validate checkInterval bounds (clamp to 1–596 h) and switch to setTimeout loop to prevent concurrent check runs\nfix: remove redundant safeTextColor alias in updateVisualisation\nfix: correct JSDoc on loadPrevState method",
+        "de": "Behebung: Überprüfung der Grenzen von checkInterval (Begrenzung auf 1–596 h) und Umstellung auf eine setTimeout-Schleife, um gleichzeitige Prüfläufe zu verhindern.\nBehebung: Überflüssigen Alias safeTextColor in updateVisualisation entfernen.\nBehoben: Korrekte JSDoc-Dokumentation der Methode loadPrevState",
+        "ru": "Исправление: проверить границы checkInterval (ограничить диапазоном 1–596 ч) и переключиться на цикл setTimeout, чтобы предотвратить одновременное выполнение проверок.\nИсправление: удален избыточный псевдоним safeTextColor в функции updateVisualisation.\nИсправление: исправлена JSDoc-документация для метода loadPrevState.",
+        "pt": "Correção: validar os limites do intervalo de verificação (limitar a 1–596 h) e alternar para um loop setTimeout para evitar execuções de verificação simultâneas.\nCorreção: remover o alias redundante safeTextColor em updateVisualisation.\nCorreção: JSDoc correto no método loadPrevState",
+        "nl": "Oplossing: valideer de grenzen van checkInterval (beperk deze tot 1–596 uur) en schakel over naar een setTimeout-lus om gelijktijdige controles te voorkomen.\nOplossing: verwijder de overbodige alias safeTextColor in updateVisualisation.\nCorrectie: correcte JSDoc voor de loadPrevState-methode.",
+        "fr": "Correction : valider les limites de checkInterval (limiter à 1–596 h) et passer à une boucle setTimeout pour empêcher les exécutions de vérifications simultanées.\nCorrection : suppression de l'alias redondant safeTextColor dans updateVisualisation\nCorrection : JSDoc corrigé pour la méthode loadPrevState",
+        "it": "Correzione: convalidare i limiti di checkInterval (limitare a 1–596 h) e passare al ciclo setTimeout per impedire esecuzioni simultanee dei controlli.\nCorrezione: rimuovere l'alias ridondante safeTextColor in updateVisualisation\nCorrezione: JSDoc corretto nel metodo loadPrevState",
+        "es": "Solución: validar los límites de checkInterval (limitarlos a 1–596 h) y cambiar al bucle setTimeout para evitar ejecuciones de comprobación simultáneas.\nCorrección: eliminar el alias redundante safeTextColor en updateVisualisation\nCorrección: JSDoc correcto en el método loadPrevState",
+        "pl": "naprawa: sprawdź granice checkInterval (ograniczenie do 1–596 h) i przełącz na pętlę setTimeout, aby zapobiec równoczesnym uruchomieniom sprawdzania\nnaprawiono: usuń zbędny alias safeTextColor w updateVisualisation\nnaprawiono: poprawiono JSDoc w metodzie loadPrevState",
+        "uk": "виправлення: перевірено межі checkInterval (обмежено значеннями 1–596 год) та переключено на цикл setTimeout для запобігання одночасним запускам перевірок\nвиправлення: видалено надлишковий псевдонім safeTextColor у updateVisualisation\nвиправлення: виправлено JSDoc у методі loadPrevState",
+        "zh-cn": "修复方案：验证 checkInterval 的界限（限制在 1–596 小时），并切换到 setTimeout 循环以防止并发检查运行\n修复：移除 updateVisualisation 中冗余的 safeTextColor 别名\n修复：更正 loadPrevState 方法的 JSDoc"
+      },
       "0.0.9": {
         "en": "fix: update adapter-core to 3.4.1, clarify malware scanner description in README (W0034)\nfix: update admin dependency to >= 7.8.23 and fix dependabot cooldown format (W8917)",
         "de": "Behoben: Adapter-Core auf Version 3.4.1 aktualisiert, Beschreibung des Malware-Scanners in der README-Datei präzisiert (W0034)\nBehoben: Aktualisierung der Admin-Abhängigkeit auf >= 7.8.23 und Korrektur des Dependabot-Cooldown-Formats (W8917)",
@@ -80,19 +93,6 @@
         "pl": "Wykrywanie malware pawns-cli: sprawdzanie procesu i pliku /tmp, punkty danych, ostrzeżenie widgetu, powiadomienie z linkiem do forum",
         "uk": "Виявлення шкідливого ПЗ pawns-cli: перевірка процесу та файлу /tmp, точки даних, попередження у віджеті, сповіщення з посиланням на форум",
         "zh-cn": "新增 pawns-cli 恶意软件检测：进程检测、/tmp 文件检测、数据点、widget 警告、含论坛链接的通知"
-      },
-      "0.0.3": {
-        "en": "Fix dark theme in admin UI",
-        "de": "Dark-Theme in der Admin-Oberfläche korrigiert",
-        "ru": "Исправлена тёмная тема в интерфейсе администратора",
-        "pt": "Correção do tema escuro na interface de administração",
-        "nl": "Donker thema in admin-interface gecorrigeerd",
-        "fr": "Correction du thème sombre dans l'interface d'administration",
-        "it": "Tema scuro corretto nell'interfaccia di amministrazione",
-        "es": "Tema oscuro corregido en la interfaz de administración",
-        "pl": "Poprawka ciemnego motywu w interfejsie administratora",
-        "uk": "Виправлена темна тема в інтерфейсі адміністратора",
-        "zh-cn": "修复管理界面中的暗色主题"
       }
     },
     "titleLang": {
