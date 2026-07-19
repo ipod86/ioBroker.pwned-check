@@ -99,10 +99,11 @@ The adapter creates data points under `pwned-check.<instance>`.
 - E-mail addresses are sent to the XposedOrNot API over HTTPS
 
 ## Changelog
-<!--
-	Placeholder for the next version (at the beginning of the line):
-	### **WORK IN PROGRESS**
--->
+### **WORK IN PROGRESS**
+* (ipod86) fix: validate checkInterval bounds (clamp to 1–596 h) and switch to setTimeout loop to prevent concurrent check runs
+* (ipod86) fix: remove redundant safeTextColor alias in updateVisualisation
+* (ipod86) fix: correct JSDoc on loadPrevState method
+
 ### 0.0.9 (2026-07-01)
 * (ipod86) fix: update adapter-core to 3.4.1, clarify malware scanner description in README (W0034)
 * (ipod86) fix: update admin dependency to >= 7.8.23 and fix dependabot cooldown format (W8917)
