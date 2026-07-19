@@ -296,7 +296,8 @@ function isValidEmail(email: string): boolean {
 }
 
 class PwnedCheck extends utils.Adapter {
-	private checkTimer: ioBroker.Interval | undefined = undefined;
+	private checkTimer: ioBroker.Timeout | undefined = undefined;
+	private _checkStopped = false;
 	private prevState: Map<string, { isPwned: boolean; leakCount?: number }> = new Map();
 	private lang: Lang = "en";
 
@@ -370,12 +371,24 @@ class PwnedCheck extends utils.Adapter {
 		// Run initial check
 		await this.runAllChecks(config);
 
-		// Set up periodic interval
-		const intervalHours = config.checkInterval ?? 24;
+		// Set up periodic check loop (setTimeout to avoid concurrent runs)
+		const rawHours = config.checkInterval ?? 24;
+		const intervalHours = Math.min(Math.max(1, rawHours), 596);
+		if (intervalHours !== rawHours) {
+			this.log.warn(`checkInterval ${rawHours}h is out of range — clamped to ${intervalHours}h`);
+		}
 		const intervalMs = intervalHours * 60 * 60 * 1000;
-		this.checkTimer = this.setInterval(async () => {
-			await this.runAllChecks(this.config as unknown as AdapterConfig);
-		}, intervalMs);
+		const scheduleNextCheck = (): void => {
+			if (this._checkStopped) {
+				return;
+			}
+			this.checkTimer = this.setTimeout(() => {
+				void this.runAllChecks(this.config as unknown as AdapterConfig)
+					.catch(e => this.log.error(`Periodic check failed: ${(e as Error).message}`))
+					.finally(scheduleNextCheck);
+			}, intervalMs);
+		};
+		scheduleNextCheck();
 	}
 
 	/**
@@ -399,8 +412,9 @@ class PwnedCheck extends utils.Adapter {
 	 * @param callback - Callback to signal unload complete
 	 */
 	private onUnload(callback: () => void): void {
+		this._checkStopped = true;
 		if (this.checkTimer) {
-			this.clearInterval(this.checkTimer);
+			this.clearTimeout(this.checkTimer);
 			this.checkTimer = undefined;
 		}
 		callback();
@@ -891,7 +905,7 @@ class PwnedCheck extends utils.Adapter {
 	}
 
 	/**
-	 * Cleans up orphaned object trees for passwords/emails removed from config
+	 * Loads previously stored isPwned/leakCount states from the DB into memory
 	 *
 	 * @param config - Current adapter configuration
 	 */
@@ -1007,8 +1021,6 @@ class PwnedCheck extends utils.Adapter {
 			safeCardBg = `rgba(${cardRgb},${(cardOpacity / 100).toFixed(2)})`;
 		}
 
-		const safeTextColor = textColor;
-
 		const lastUpdateMs = Date.now();
 		const lastUpdateStr = new Date(lastUpdateMs).toLocaleString();
 
@@ -1039,12 +1051,12 @@ class PwnedCheck extends utils.Adapter {
 				compactView
 					? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 					${lockSvg}
-					<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.description)}</div>
+					<div style="font-weight:600;color:${textColor};">${escapeHtml(entry.description)}</div>
 				</div>`
 					: `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
 					${lockSvg}
 					<div>
-						<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.description)}</div>
+						<div style="font-weight:600;color:${textColor};">${escapeHtml(entry.description)}</div>
 						<div style="font-size:0.85em;color:${statusColor};font-weight:500;">${statusText}</div>
 					</div>
 				</div>`,
@@ -1091,12 +1103,12 @@ class PwnedCheck extends utils.Adapter {
 				compactView
 					? `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
 					${lockSvg}
-					<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.email)}</div>
+					<div style="font-weight:600;color:${textColor};">${escapeHtml(entry.email)}</div>
 				</div>`
 					: `<div style="background:${safeCardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
 					${lockSvg}
 					<div>
-						<div style="font-weight:600;color:${safeTextColor};">${escapeHtml(entry.email)}</div>
+						<div style="font-weight:600;color:${textColor};">${escapeHtml(entry.email)}</div>
 						<div style="font-size:0.85em;color:${statusColor};font-weight:500;">${statusText}</div>
 					</div>
 				</div>`,
@@ -1125,9 +1137,9 @@ class PwnedCheck extends utils.Adapter {
 						: `<div style="background:${safeCardBg};border:2px solid #e53935;border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;">
 						${warnSvg}
 						<div>
-							<div style="font-weight:600;color:${safeTextColor};">${t("malwareTitle", this.lang)}</div>
+							<div style="font-weight:600;color:${textColor};">${t("malwareTitle", this.lang)}</div>
 							<div style="font-size:0.9em;color:#e53935;font-weight:600;">${t("malwareSells", this.lang)}</div>
-							<div style="font-size:0.8em;color:${safeTextColor};opacity:0.7;">${t("malwareAction", this.lang)}</div>
+							<div style="font-size:0.8em;color:${textColor};opacity:0.7;">${t("malwareAction", this.lang)}</div>
 							<div style="margin-top:4px;"><a href="https://forum.iobroker.net/topic/66381" target="_blank" style="color:#1976d2;font-size:0.75em;">${t("malwareForum", this.lang)}</a></div>
 						</div>
 					</div>`;
@@ -1136,11 +1148,11 @@ class PwnedCheck extends utils.Adapter {
 			: "";
 
 		const html = `
-<div style="font-family:sans-serif;font-size:${fontSize}px;background:${bgColor};padding:16px;border-radius:10px;color:${safeTextColor};">
-	<h3 style="margin:0 0 12px 0;color:${safeTextColor};">Pwned Check</h3>
+<div style="font-family:sans-serif;font-size:${fontSize}px;background:${bgColor};padding:16px;border-radius:10px;color:${textColor};">
+	<h3 style="margin:0 0 12px 0;color:${textColor};">Pwned Check</h3>
 	${malwareSection}
-	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">${t("sectionPasswords", this.lang)}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
-	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${safeTextColor};">${t("sectionEmails", this.lang)}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${emailCards.join("")}</div>` : ""}
+	${passwords.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${textColor};">${t("sectionPasswords", this.lang)}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${pwCards.join("")}</div>` : ""}
+	${emails.length > 0 ? `<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:${textColor};">${t("sectionEmails", this.lang)}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px;">${emailCards.join("")}</div>` : ""}
 	${passwords.length === 0 && emails.length === 0 && !malwareDetected ? `<div style="color:#888;font-size:0.9em;">${t("noEntries", this.lang)}</div>` : ""}
 	<div style="font-size:0.8em;color:#888;margin-top:10px;">${t("lastCheck", this.lang)} ${lastUpdateStr}</div>
 </div>`;
