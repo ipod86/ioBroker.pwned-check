@@ -11,10 +11,16 @@
   "license": "MIT",
   "keywords": [
     "ioBroker",
-    "automation",
-    "IoT",
-    "integration",
-    "security"
+    "security",
+    "password",
+    "leak",
+    "breach",
+    "check",
+    "privacy",
+    "password-check",
+    "hibp",
+    "pwned",
+    "credentials"
   ],
   "repository": {
     "type": "git",

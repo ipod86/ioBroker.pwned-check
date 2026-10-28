@@ -96,17 +96,17 @@
       }
     },
     "titleLang": {
-      "en": "Pwned Check",
-      "de": "Pwned Check",
-      "ru": "Pwned Check",
-      "pt": "Pwned Check",
-      "nl": "Pwned Check",
-      "fr": "Pwned Check",
-      "it": "Pwned Check",
-      "es": "Pwned Check",
-      "pl": "Pwned Check",
-      "uk": "Pwned Check",
-      "zh-cn": "Pwned Check"
+      "en": "Pwned Check – Password & Email Breaches",
+      "de": "Pwned Check – Passwort- & E-Mail-Leaks",
+      "ru": "Pwned Check – утечки паролей и e-mail",
+      "pt": "Pwned Check – vazamentos de senhas e e-mails",
+      "nl": "Pwned Check – gelekte wachtwoorden & e-mails",
+      "fr": "Pwned Check – fuites de mots de passe et d'e-mails",
+      "it": "Pwned Check – violazioni di password ed e-mail",
+      "es": "Pwned Check – filtraciones de contraseñas y correos",
+      "pl": "Pwned Check – wycieki haseł i e-maili",
+      "uk": "Pwned Check – витоки паролів та e-mail",
+      "zh-cn": "Pwned Check – 密码与邮箱泄露检测"
     },
     "desc": {
       "en": "Leak & Password Check (Privacy First)",
